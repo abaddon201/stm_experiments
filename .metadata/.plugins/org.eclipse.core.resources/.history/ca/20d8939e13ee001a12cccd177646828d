@@ -1,0 +1,21 @@
+/*
+ * fonts.h
+ *
+ *  Created on: Sep 2, 2020
+ *      Author: user
+ */
+
+#ifndef INC_FONTS_H_
+#define INC_FONTS_H_
+
+
+class FontSystem {
+public:
+    void init();
+
+    void drawChar(struct _tFont *font, uint16_t x, uint16_t y, uint8_t s);
+
+};
+
+
+#endif /* INC_FONTS_H_ */

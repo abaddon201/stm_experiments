@@ -1,0 +1,57 @@
+#include "cmsis_os.h"
+#include "dac.h"
+#include "fatfs.h"
+#include "sdio.h"
+#include "gpio.h"
+#include "fsmc.h"
+#include "fonts.h"
+
+#define  ARM_CM_DEMCR      (*(uint32_t *)0xE000EDFC)
+#define  ARM_CM_DWT_CTRL   (*(uint32_t *)0xE0001000)
+#define  ARM_CM_DWT_CYCCNT (*(uint32_t *)0xE0001004)
+
+FontSystem fonts;
+
+void displayTask(void *params) {
+    fonts.init();
+    /*uint32_t start;
+     uint32_t stop;
+     uint32_t delta;*/
+    while (1) {
+        //start = ARM_CM_DWT_CYCCNT;
+        TFT9341_FillScreen(RED);
+        TFT9341_FillScreen(BLUE);
+        /*stop  = ARM_CM_DWT_CYCCNT;
+         delta = stop-start;
+         stop=0;*/
+    }
+}
+
+void baseInit() {
+    TFT9341_ini();
+
+    if (ARM_CM_DWT_CTRL != 0) {        // See if DWT is available
+        ARM_CM_DEMCR |= 1 << 24;  // Set bit 24
+        ARM_CM_DWT_CYCCNT = 0;
+        ARM_CM_DWT_CTRL |= 1 << 0;   // Set bit 0
+    }
+
+    FATFS SDFatFs; /* File system object for SD card logical drive */
+
+    char SD_Path[4]; /* SD logical drive path */
+
+    if (f_mount(&SDFatFs, (TCHAR const*) SD_Path, 0) != FR_OK) {
+        Error_Handler();
+    } else {
+        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+    }
+    /*for(i=0;i<200;++i){
+     start = ARM_CM_DWT_CYCCNT;
+     stop  = ARM_CM_DWT_CYCCNT;
+
+     delta = stop - start;
+     ms = delta*1000/168000000;
+     }*/
+
+    xTaskCreate(displayTask, "Display", 1024, 0, 1, 0);
+}

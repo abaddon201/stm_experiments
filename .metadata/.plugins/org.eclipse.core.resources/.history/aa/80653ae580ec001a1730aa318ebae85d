@@ -1,0 +1,14 @@
+/*
+ * ili9341.c
+ *
+ *  Created on: Sep 1, 2020
+ *      Author: user
+ */
+
+#include "ili9341.h"
+
+
+ void TFT9341_ini(void)
+{
+
+}
