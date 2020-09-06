@@ -1,1 +1,4 @@
 .metadata/
+*.d
+*.o
+tft/Debug

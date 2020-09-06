@@ -10,7 +10,10 @@
 
 #include <cstdint>
 
+class Tft9341;
+
 class FontSystem {
+    Tft9341* display;
 public:
     struct Font {
         uint16_t Width;
@@ -24,6 +27,8 @@ public:
     Font Font16;
     Font Font12;
     Font Font8;
+
+    FontSystem(Tft9341* display) : display{display}{};
 
     void init();
     void loadFont(struct Font *font, uint16_t w, uint16_t h, const char *fname);

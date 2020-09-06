@@ -20,17 +20,51 @@
 #define  YELLOW 0xFFE0
 #define  WHITE 0xFFFF
 
-extern uint16_t X_SIZE;
-extern uint16_t Y_SIZE;
+/**
+ * class for working with ili9341 display controller
+ */
+class Tft9341 {
+    uint16_t X_SIZE;
+    uint16_t Y_SIZE;
 
-void TFT9341_ini(void);
+    void delay(uint32_t dly);
+    void delayMicro(__IO uint32_t micros);
+    uint32_t readReg(uint8_t r);
 
-uint32_t TFT9341_ReadReg(uint8_t r);
+    inline void sendCommand(unsigned char cmd) {
+        TFT9341_ADDR_CMD = cmd;
+    }
 
-void TFT9341_SetRotation(unsigned char r);
+    inline void sendData(unsigned char dt) {
+        TFT9341_ADDR_DATA = dt;
+    }
 
-void TFT9341_reset(void);
-void TFT9341_FillScreen(uint16_t color);
-void TFT9341_DrawPixel(int x, int y, uint16_t color);
+    void flood(uint16_t color, uint32_t len);
+
+    void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+
+public:
+
+    // init/reset
+    void init();
+    void reset();
+
+    //display control
+    void setRotation(unsigned char r);
+    uint16_t xSize() {
+        return X_SIZE;
+    }
+
+    // primitive drawings
+    void fillScreen(uint16_t color);
+    void fillRectangle(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
+            uint16_t y2);
+    void drawPixel(int x, int y, uint16_t color);
+    void drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
+            uint16_t y2);
+    void drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
+            uint16_t y2);
+    void drawCircle(uint16_t x0, uint16_t y0, int r, uint16_t color);
+};
 
 #endif /* ILI9341_H_ */ 

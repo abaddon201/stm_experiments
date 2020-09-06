@@ -14,11 +14,13 @@
 #define  ARM_CM_DWT_CTRL   (*(uint32_t *)0xE0001000)
 #define  ARM_CM_DWT_CYCCNT (*(uint32_t *)0xE0001004)
 
-FontSystem fonts;
+FontSystem *fonts;
+Tft9341 *display;
 
 extern "C" FATFS SDFatFS; /* File system object for SD card logical drive */
 
 void displayTask(void *params) {
+    display->init();
     char SD_Path[4]; /* SD logical drive path */
 
     FRESULT res; /* FatFs function common result code */
@@ -29,15 +31,15 @@ void displayTask(void *params) {
         /*    } else {
          HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);*/
     }
-    fonts.init();
+    fonts->init();
     /*uint32_t start;
      uint32_t stop;
      uint32_t delta;*/
-    TFT9341_FillScreen(RED);
     while (1) {
+        //TFT9341_FillScreen(RED);
         //start = ARM_CM_DWT_CYCCNT;
         //TFT9341_FillScreen(BLUE);
-        fonts.drawString(&fonts.Font16, 10, 10, "Hello world");
+        fonts->drawString(&fonts->Font16, 0, 62, "Hello world");
         /*stop  = ARM_CM_DWT_CYCCNT;
          delta = stop-start;
          stop=0;*/
@@ -45,7 +47,8 @@ void displayTask(void *params) {
 }
 
 extern "C" void baseInit() {
-    TFT9341_ini();
+    display = new Tft9341();
+    fonts = new FontSystem(display);
 
     if (ARM_CM_DWT_CTRL != 0) {        // See if DWT is available
         ARM_CM_DEMCR |= 1 << 24;  // Set bit 24

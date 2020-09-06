@@ -61,7 +61,7 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
     uint8_t offset1; //разница между реальной шириной и шириной в байтах
     uint16_t offsetfile = 0; //Смещение символа в файле шрифта
 
-    if ((x + font->Width) >= X_SIZE)
+    if ((x + font->Width) >= display->xSize())
         return;
 
     offset1 = font->bytesWidth * 8 - font->Width;
@@ -69,7 +69,7 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
     offsetfile = (s - ' ') * fontsize;
 
     //FIXME: maybe this must be in file read part
-    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+    //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
     //FIXME: end
 
     for (i = 0; i < height; i++) {
@@ -86,9 +86,9 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
         uint16_t mask = 1 << (width + offset1 - 1);
         for (j = 0; j < width; j++) {
             if (line & mask) {
-                TFT9341_DrawPixel(x + j, y, BLACK);
+                display->drawPixel(x + j, y, BLACK);
             } else {
-                TFT9341_DrawPixel(x + j, y, WHITE);
+                display->drawPixel(x + j, y, WHITE);
             }
             mask >>= 1;
         }
