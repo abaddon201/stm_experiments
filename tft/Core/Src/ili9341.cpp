@@ -11,8 +11,6 @@
 #define  TFT9341_RESET_ACTIVE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_RESET);
 #define  TFT9341_RESET_IDLE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_SET);
 
-#define convert24to16(x) (((x & 0x00f80000) >> 8 ) | ((x & 0x0000fc00) >> 5) |((x & 0x000000f8) >> 3))
-
 void Tft9341::init() {
 //    uint32_t dtt = 0;
 

@@ -44,6 +44,10 @@ class Tft9341 {
     void setAddrWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 
 public:
+    static uint16_t convert24to16(uint32_t x) {
+        return (((x & 0x00f80000) >> 8) | ((x & 0x0000fc00) >> 5)
+                | ((x & 0x000000f8) >> 3));
+    }
 
     // init/reset
     void init();
