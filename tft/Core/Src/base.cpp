@@ -23,21 +23,21 @@ void displayTask(void *params) {
 
     FRESULT res; /* FatFs function common result code */
     memset(&SDFatFS, 0, sizeof(FATFS));
-res = f_mount(&SDFatFS, (TCHAR const*) SD_Path, 1);
+    res = f_mount(&SDFatFS, (TCHAR const*) SD_Path, 1);
     if (res != FR_OK) {
         Error_Handler();
-/*    } else {
-        HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);*/
+        /*    } else {
+         HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);*/
     }
-    osDelay(100);
     fonts.init();
     /*uint32_t start;
      uint32_t stop;
      uint32_t delta;*/
+    TFT9341_FillScreen(RED);
     while (1) {
         //start = ARM_CM_DWT_CYCCNT;
-        TFT9341_FillScreen(RED);
-        TFT9341_FillScreen(BLUE);
+        //TFT9341_FillScreen(BLUE);
+        fonts.drawString(&fonts.Font16, 10, 10, "Hello world");
         /*stop  = ARM_CM_DWT_CYCCNT;
          delta = stop-start;
          stop=0;*/

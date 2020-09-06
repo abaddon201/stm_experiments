@@ -293,6 +293,7 @@ __weak uint8_t BSP_SD_IsDetected(void)
 
   if (BSP_PlatformIsDetected() == 0x0)
   {
+      ///FIXME: ABBY: current board doesn't support card detection
  //   status = SD_NOT_PRESENT;
   }
 

@@ -13,13 +13,12 @@
 #include "ff.h"
 #include "ili9341.h"
 
-    FIL MyFile;
-
 void FontSystem::loadFont(struct Font *font, uint16_t w, uint16_t h, const char *fname) {
+    FIL *MyFile = new FIL();
     FRESULT res; /* FatFs function common result code */
-    memset(&MyFile, 0, sizeof(FIL));
+    memset(MyFile, 0, sizeof(FIL));
 
-    res = f_open(&MyFile, fname, FA_READ);
+    res = f_open(MyFile, fname, FA_READ);
     if (res != FR_OK) {
         Error_Handler();
         return;
@@ -31,16 +30,17 @@ void FontSystem::loadFont(struct Font *font, uint16_t w, uint16_t h, const char 
     uint16_t symbolSize = h * font->bytesWidth;
     font->data = new uint8_t[95 * symbolSize];
     UINT bytesRead;
-    res = f_read(&MyFile, font->data, 8, &bytesRead);
+    res = f_read(MyFile, font->data, 95 * symbolSize, &bytesRead);
     if ((bytesRead == 0) || (res != FR_OK)) {
-        free(font->data);
+        delete[] font->data;
         font->data = 0;
         font->Width = 0;
         font->Height = 0;
         Error_Handler();
         return;
     }
-    f_close(&MyFile);
+    f_close(MyFile);
+    delete MyFile;
 }
 
 void FontSystem::init() {
@@ -97,21 +97,21 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
 }
 
 /*void TFT9341_SetTextColor(uint16_t color) {
-    lcdprop.TextColor = color;
-}
+ lcdprop.TextColor = color;
+ }
 
-//————————————————————–
+ //————————————————————–
 
-void TFT9341_SetBackColor(uint16_t color) {
-    lcdprop.BackColor = color;
-}
-*/
+ void TFT9341_SetBackColor(uint16_t color) {
+ lcdprop.BackColor = color;
+ }
+ */
 
-void FontSystem::drawString(Font* font, uint16_t x, uint16_t y, char *str) {
+void FontSystem::drawString(Font *font, uint16_t x, uint16_t y, const char *str) {
     while (*str) {
         drawChar(font, x, y, str[0]);
         x += font->Width;
-        (void) *str++;
+        ++str;
     }
 }
 

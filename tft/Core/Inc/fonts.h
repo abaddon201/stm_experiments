@@ -29,7 +29,7 @@ public:
     void loadFont(struct Font *font, uint16_t w, uint16_t h, const char *fname);
 
     void drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s);
-    void drawString(Font* font, uint16_t x, uint16_t y, char *str);
+    void drawString(Font* font, uint16_t x, uint16_t y, const char *str);
 };
 
 
