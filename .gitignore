@@ -1,5 +1,5 @@
-
-.metadata/.plugins/org.eclipse.core.resources/.history/58/c0dc5f675af0001a15ecea442e17266e
-.metadata/.plugins/org.eclipse.core.resources/.projects/tft/.indexes/bf/c4/history.index
+.metadata/.plugins/org.eclipse.core.resources/.history/*
+.metadata/.plugins/org.eclipse.core.resources/.projects/tft/.indexes/*
 .metadata/.plugins/org.eclipse.cdt.ui/global-build.log
 .metadata/.plugins/org.eclipse.cdt.ui/tft.build.log
+.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.launchbar.core.prefs
