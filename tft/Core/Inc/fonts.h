@@ -13,7 +13,7 @@
 class Tft9341;
 
 class FontSystem {
-    Tft9341* display;
+    Tft9341 *display;
 public:
     struct Font {
         uint16_t Width;
@@ -28,14 +28,16 @@ public:
     Font Font12;
     Font Font8;
 
-    FontSystem(Tft9341* display) : display{display}{};
+    FontSystem(Tft9341 *display) :
+            display { display } {
+    }
+    ;
 
     void init();
     void loadFont(struct Font *font, uint16_t w, uint16_t h, const char *fname);
 
     void drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s);
-    void drawString(Font* font, uint16_t x, uint16_t y, const char *str);
+    void drawString(Font *font, uint16_t x, uint16_t y, const char *str);
 };
-
 
 #endif /* INC_FONTS_H_ */

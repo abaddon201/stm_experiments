@@ -268,8 +268,7 @@ void Tft9341::flood(uint16_t color, uint32_t len) {
      }*/
 }
 
-void Tft9341::setAddrWindow(uint16_t x1, uint16_t y1, uint16_t x2,
-        uint16_t y2) {
+void Tft9341::setAddrWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
     sendCommand(0x2A); //Column Addres Set
     sendData(x1 >> 8);
     sendData(x1 & 0xFF);
@@ -290,8 +289,7 @@ void Tft9341::fillScreen(uint16_t color) {
     flood(color, (long) X_SIZE * (long) Y_SIZE);
 }
 
-void Tft9341::fillRectangle(uint16_t color, uint16_t x1, uint16_t y1,
-        uint16_t x2, uint16_t y2) {
+void Tft9341::fillRectangle(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
     setAddrWindow(x1, y1, x2, y2);
     flood(color, (uint16_t) (x2 - x1 + 1) * (uint16_t) (y2 - y1 + 1));
 }
@@ -307,8 +305,7 @@ void Tft9341::drawPixel(int x, int y, uint16_t color) {
     sendData(color & 0xFF);
 }
 
-void Tft9341::drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
-        uint16_t y2) {
+void Tft9341::drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
     int steep = abs(y2 - y1) > abs(x2 - x1);
     if (steep) {
         swap(x1, y1);
@@ -348,8 +345,7 @@ void Tft9341::drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
     }
 }
 
-void Tft9341::drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
-        uint16_t y2) {
+void Tft9341::drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
     drawLine(color, x1, y1, x2, y1);
     drawLine(color, x2, y1, x2, y2);
     drawLine(color, x1, y1, x1, y2);

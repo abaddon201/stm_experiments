@@ -18,5 +18,4 @@ public:
     ZxScreen();
 };
 
-
 #endif /* INC_ZX_SCREEN_H_ */

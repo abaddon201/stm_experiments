@@ -8,6 +8,8 @@
 
 #include "ili9341.h"
 
+#include "touch.h"
+
 #include <string.h>
 
 #define  ARM_CM_DEMCR      (*(uint32_t *)0xE000EDFC)
@@ -32,14 +34,20 @@ void displayTask(void *params) {
          HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);*/
     }
     fonts->init();
+    //TP_Init();
     /*uint32_t start;
      uint32_t stop;
      uint32_t delta;*/
+    uint16_t x,y;
+    uint8_t pressed;
     while (1) {
         //TFT9341_FillScreen(RED);
         //start = ARM_CM_DWT_CYCCNT;
         //TFT9341_FillScreen(BLUE);
         fonts->drawString(&fonts->Font16, 0, 62, "Hello world");
+//        pressed=TP_Read_XY(&x, &y);
+        pressed = ILI9341_TouchGetCoordinates(&x, &y);
+
         /*stop  = ARM_CM_DWT_CYCCNT;
          delta = stop-start;
          stop=0;*/
@@ -64,5 +72,5 @@ extern "C" void baseInit() {
      ms = delta*1000/168000000;
      }*/
 
-    xTaskCreate(displayTask, "Display", 1024, 0, 1, 0);
+    xTaskCreate(displayTask, "Display", 2024, 0, 1, 0);
 }

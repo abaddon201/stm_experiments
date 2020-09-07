@@ -24,6 +24,7 @@
 #include "dma.h"
 #include "fatfs.h"
 #include "sdio.h"
+#include "spi.h"
 #include "gpio.h"
 #include "fsmc.h"
 
@@ -101,6 +102,7 @@ int main(void)
   MX_DAC_Init();
   MX_SDIO_SD_Init();
   MX_FATFS_Init();
+  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
     baseInit();
   /* USER CODE END 2 */

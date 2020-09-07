@@ -45,8 +45,7 @@ class Tft9341 {
 
 public:
     static uint16_t convert24to16(uint32_t x) {
-        return (((x & 0x00f80000) >> 8) | ((x & 0x0000fc00) >> 5)
-                | ((x & 0x000000f8) >> 3));
+        return (((x & 0x00f80000) >> 8) | ((x & 0x0000fc00) >> 5) | ((x & 0x000000f8) >> 3));
     }
 
     // init/reset
@@ -61,13 +60,10 @@ public:
 
     // primitive drawings
     void fillScreen(uint16_t color);
-    void fillRectangle(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
-            uint16_t y2);
+    void fillRectangle(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
     void drawPixel(int x, int y, uint16_t color);
-    void drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
-            uint16_t y2);
-    void drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2,
-            uint16_t y2);
+    void drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+    void drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
     void drawCircle(uint16_t x0, uint16_t y0, int r, uint16_t color);
 };
 
