@@ -2,3 +2,5 @@
 *.d
 *.o
 tft/Debug
+WaveformGenerator-master/
+tmp469/
