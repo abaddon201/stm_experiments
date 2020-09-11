@@ -9,6 +9,7 @@
 #include "ili9341.h"
 
 #include "touch.h"
+#include "zx_tap_player.h"
 
 #include <string.h>
 
@@ -18,8 +19,16 @@
 
 FontSystem *fonts;
 Tft9341 *display;
+ZxTapPlayer zxTapPlayer;
 
 extern "C" FATFS SDFatFS; /* File system object for SD card logical drive */
+
+static void delay_ms(__IO uint32_t micros) {
+    micros *= (SystemCoreClock / 1000000) / 5;
+
+    while (micros--)
+        ;
+}
 
 void displayTask(void *params) {
     display->init();
@@ -44,17 +53,23 @@ void displayTask(void *params) {
         //TFT9341_FillScreen(RED);
         //start = ARM_CM_DWT_CYCCNT;
         //TFT9341_FillScreen(BLUE);
-        fonts->drawString(&fonts->Font16, 0, 62, "Hello world");
+        //fonts->drawString(&fonts->Font16, 0, 62, "Hello world");
 //        pressed=TP_Read_XY(&x, &y);
-        pressed = ILI9341_TouchGetCoordinates(&x, &y);
+        //pressed = ILI9341_TouchGetCoordinates(&x, &y);
 
         /*stop  = ARM_CM_DWT_CYCCNT;
          delta = stop-start;
          stop=0;*/
+        zxTapPlayer.playWave(2047);
+        delay_ms(489);
+        zxTapPlayer.playWave(1023);
+        delay_ms(245);
     }
 }
 
 extern "C" void baseInit() {
+    zxTapPlayer.playWave(807);
+    HAL_Delay(2000);
     display = new Tft9341();
     fonts = new FontSystem(display);
 

@@ -15,6 +15,8 @@ class ZxTapPlayer {
 
 public:
     ZxTapPlayer();
+
+    void playWave(uint32_t freq);
 };
 
 #endif /* INC_ZX_TAP_PLAYER_H_ */
