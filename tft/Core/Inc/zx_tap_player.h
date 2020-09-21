@@ -10,13 +10,40 @@
 
 #include <stdio.h>
 
+#define TAP_DMA_BUFFER_SIZE 8192
+
+#include "zx_tap_sample.h"
+
+class ZxTapFeeder;
 class ZxTapPlayer {
-    void generateWave(uint16_t *dac_data, uint32_t dac_data_cnt, uint8_t duty);
+
+    // FIXME: define size according to the speed and memory available
+    uint8_t dmaBuffer[TAP_DMA_BUFFER_SIZE];
+    bool fileEnded;
+
+    bool writeCurrentSample();
+
+    ZxTapFeeder *feeder;
+    Sample currentSample;
 
 public:
     ZxTapPlayer();
 
-    void playWave(uint32_t freq);
+    /**
+     * play tap file
+     */
+    void play(ZxTapFeeder *feeder);
+
+    /**
+     * pause playing file
+     */
+    void pause();
+
+    void fillBuffer(int part);
+    /**
+     * stop playing file
+     */
+    void stop();
 };
 
 #endif /* INC_ZX_TAP_PLAYER_H_ */

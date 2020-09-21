@@ -6,61 +6,184 @@
  */
 
 #include "zx_tap_player.h"
+#include "zx_tap_feeder.h"
 #include <math.h>
 #include <stm32f4xx_hal.h>
 #include "tim.h"
 #include "dac.h"
 
-ZxTapPlayer::ZxTapPlayer() {
-
+namespace {
+ZxTapPlayer* _player;
 }
 
-static const uint32_t DAC_MAX_VAL = 0x00000FFFU;
-static constexpr double PI = 3.1415926535897932384626433832795F;
+extern "C" {
+/**
+ * @brief  Conversion complete callback in non blocking mode for Channel1
+ * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
+ *         the configuration information for the specified DAC.
+ * @retval None
+ */
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac) {
+    /* Prevent unused argument(s) compilation warning */
+    _player->fillBuffer(1);
+}
 
-void ZxTapPlayer::generateWave(uint16_t *dac_data, uint32_t dac_data_cnt, uint8_t duty) {
-    uint32_t max_val = (DAC_MAX_VAL * duty) / 100U;
-    uint32_t shift = (DAC_MAX_VAL - max_val) / 2U;
-    for (uint32_t i = 0U; i < dac_data_cnt; i++) {
-        dac_data[i] = (uint16_t) ((sin((2.0F * i * PI) / (dac_data_cnt + 1)) + 1.0F) * max_val) >> 1U;
-        dac_data[i] += shift;
+/**
+ * @brief  Conversion half DMA transfer callback in non blocking mode for Channel1
+ * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
+ *         the configuration information for the specified DAC.
+ * @retval None
+ */
+void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac) {
+    /* Prevent unused argument(s) compilation warning */
+    _player->fillBuffer(0);
+}
+
+}
+/*
+ void ZxTapPlayer::outTone(unsigned char level, int samplesCount) {
+ for (int n = 0; n < samplesCount; n++) {
+ // FIXME: write to the DMA buffer
+ //fwrite((unsigned char*) &level, 1, 1, hwav);
+ }
+ }
+
+ void ZxTapPlayer::outByte(uint8_t byte) {
+ for (int i = 0; i < 8; i++, byte <<= 1) {
+ if (byte & 128) {
+ outTone(HI, samplesCountOne);
+ outTone(LOW, samplesCountOne);
+ } else {
+ outTone(HI, samplesCountZero);
+ outTone(LOW, samplesCountZero);
+ }
+ }
+ }
+ */
+
+void ZxTapPlayer::fillBuffer(int part) {
+    if (fileEnded) {
+        stop();
+        return;
+    }
+    uint8_t *buffer = &(dmaBuffer[part * (TAP_DMA_BUFFER_SIZE / 2)]);
+    int position = 0;
+    if (currentSample.samples) {
+        while (currentSample.samples != 0) {
+            buffer[position] = currentSample.level;
+            --currentSample.samples;
+            position++;
+            if (position >= TAP_DMA_BUFFER_SIZE / 2) {
+                return;
+            }
+        }
+    }
+    //prepare next sample
+    while (feeder->nextSample(currentSample)) {
+        while (currentSample.samples != 0) {
+            buffer[position] = currentSample.level;
+            --currentSample.samples;
+            position++;
+            if (position >= TAP_DMA_BUFFER_SIZE / 2) {
+                return;
+            }
+        }
+    }
+    // file ended, need to fill with silence, and set flag to stop next time
+    fileEnded = true;
+    for (; position < TAP_DMA_BUFFER_SIZE / 2; ++position) {
+        buffer[position] = 0;
     }
 }
+/*
+ bool ZxTapPlayer::writeCurrentSample() {
+ if (currentSample.samples) {
+ while (currentSample.samples != 0) {
+ dmaBuffer[position] = currentSample.level;
+ --currentSample.samples;
+ position++;
+ if (position >= TAP_DMA_BUFFER_SIZE / 2) {
+ return false;
+ }
+ }
+ }
+ //prepare next sample
+ return true;
+ }
+ */
+void ZxTapPlayer::play(ZxTapFeeder *feeder) {
+    _player = this;
+    this->feeder = feeder;
+    fileEnded = false;
+    fillBuffer(0);
+    fillBuffer(1);
 
-#define NS  128
-uint32_t Wave_LUT[NS] = {
-    2048, 2149, 2250, 2350, 2450, 2549, 2646, 2742, 2837, 2929, 3020, 3108, 3193, 3275, 3355,
-    3431, 3504, 3574, 3639, 3701, 3759, 3812, 3861, 3906, 3946, 3982, 4013, 4039, 4060, 4076,
-    4087, 4094, 4095, 4091, 4082, 4069, 4050, 4026, 3998, 3965, 3927, 3884, 3837, 3786, 3730,
-    3671, 3607, 3539, 3468, 3394, 3316, 3235, 3151, 3064, 2975, 2883, 2790, 2695, 2598, 2500,
-    2400, 2300, 2199, 2098, 1997, 1896, 1795, 1695, 1595, 1497, 1400, 1305, 1212, 1120, 1031,
-    944, 860, 779, 701, 627, 556, 488, 424, 365, 309, 258, 211, 168, 130, 97,
-    69, 45, 26, 13, 4, 0, 1, 8, 19, 35, 56, 82, 113, 149, 189,
-    234, 283, 336, 394, 456, 521, 591, 664, 740, 820, 902, 987, 1075, 1166, 1258,
-    1353, 1449, 1546, 1645, 1745, 1845, 1946, 2047
-};
-
-constexpr int BASE_FREQ = 84000000/NS;
-
-void ZxTapPlayer::playWave(uint32_t freq) {
-    HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*)Wave_LUT, 128, DAC_ALIGN_12B_R);
+    HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_1, (uint32_t*) dmaBuffer, TAP_DMA_BUFFER_SIZE, DAC_ALIGN_8B_R);
     /*RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
 
-    TIM4->PSC = 0;
-    // 0 - 7MHz
-    // 1 - 3.5MHz
-    // 3 - 1.75 MHz
+     TIM4->PSC = 0;
+     // 0 - 7MHz
+     // 1 - 3.5MHz
+     // 3 - 1.75 MHz
 
-    TIM4->ARR = 624;
+     TIM4->ARR = 624;
 
-    //TIM12->CCER |= TIM_CCER_CC2E | TIM_CCER_CC1E;
-    //TIM12->BDTR |= TIM_BDTR_MOE;
+     //TIM12->CCER |= TIM_CCER_CC2E | TIM_CCER_CC1E;
+     //TIM12->BDTR |= TIM_BDTR_MOE;
 
-    //TIM12->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2;
+     //TIM12->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2;
 
-    TIM4->CR1 |= TIM_CR1_CEN;
-*/
-    TIM4->PSC = 0;
-    TIM4->ARR = BASE_FREQ/freq -1;
+     TIM4->CR1 |= TIM_CR1_CEN;
+     */
     HAL_TIM_Base_Start(&htim4);
+    /*
+     unsigned char byte;
+     while (1) {
+     unsigned short length;
+     if (readedBytes - currentByte<2) {
+     if (f_read(&file, fileBuff, FILE_BLOCK_SIZE, &readedBytes)!=FR_OK) {
+     //FIXME: error handling
+     break;
+     }
+     }
+     //get block length
+     length = (fileBuff[currentByte]<<8) | fileBuff[currentByte+1];
+     currentByte+=2;
+     //create pilot tone
+     int pilotImpulses;
+
+     if (fileBuff[currentByte]) {
+     pilotImpulses = IMPULSNUMBER_PILOT_DATA;
+     } else {
+     pilotImpulses = IMPULSNUMBER_PILOT_HEADER;
+     }
+     for (int m = 0; m < pilotImpulses; m++) {
+     outTone(HI, samplesCountPilot);
+     outTone(LOW, samplesCountPilot);
+     }
+     //формируем синхросигнал
+     outTone(HI, samplesCountSync1);
+     outTone(LOW, samplesCountSync2);
+     //читаем данные и выдаём их
+     outByte(fileBuff[2]);
+     for (int l = 1; l < length; l++) {
+     unsigned char byte;
+     //if (fread(&byte, 1, sizeof(char), file_tap) < sizeof(char))
+     break;/
+     outByte(byte);
+     }
+     outTone(HI, samplesCountSync3);
+     //пауза
+     outTone(LOW, samplesCountPause);
+     }*/
 }
+
+void ZxTapPlayer::stop() {
+    HAL_DAC_Stop_DMA(&hdac, DAC_CHANNEL_1);
+    HAL_TIM_Base_Stop(&htim4);
+
+}
+
+ZxTapPlayer::ZxTapPlayer() {
+}
+

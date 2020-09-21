@@ -10,6 +10,7 @@
 
 #include "touch.h"
 #include "zx_tap_player.h"
+#include "zx_tap_feeder.h"
 
 #include <string.h>
 
@@ -20,8 +21,10 @@
 FontSystem *fonts;
 Tft9341 *display;
 ZxTapPlayer zxTapPlayer;
+ZxTapFeeder zxTapFeeder;
 
 extern "C" FATFS SDFatFS; /* File system object for SD card logical drive */
+extern "C" DMA_HandleTypeDef hdma_dac1;
 
 static void delay_ms(__IO uint32_t micros) {
     micros *= (SystemCoreClock / 1000000) / 5;
@@ -43,6 +46,9 @@ void displayTask(void *params) {
          HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);*/
     }
     fonts->init();
+
+    zxTapFeeder.initFile("Batty.tap", 44100);
+    zxTapPlayer.play(&zxTapFeeder);
     //TP_Init();
     /*uint32_t start;
      uint32_t stop;
@@ -60,15 +66,15 @@ void displayTask(void *params) {
         /*stop  = ARM_CM_DWT_CYCCNT;
          delta = stop-start;
          stop=0;*/
-        zxTapPlayer.playWave(2047);
+        //zxTapPlayer.playWave(2047);
         delay_ms(489);
-        zxTapPlayer.playWave(1023);
+        //zxTapPlayer.playWave(1023);
         delay_ms(245);
     }
 }
 
 extern "C" void baseInit() {
-    zxTapPlayer.playWave(807);
+    //zxTapPlayer.playWave(807);
     HAL_Delay(2000);
     display = new Tft9341();
     fonts = new FontSystem(display);
@@ -87,6 +93,6 @@ extern "C" void baseInit() {
      ms = delta*1000/168000000;
      }*/
 
-    xTaskCreate(displayTask, "Display", 2024, 0, 1, 0);
+    xTaskCreate(displayTask, "Display", 3024, 0, 1, 0);
 }
 
