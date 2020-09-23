@@ -6,13 +6,17 @@
  */
 
 #include "ili9341.h"
-#include "ff.h"
+//#include "ff.h"
+
+#include "delay.h"
 
 #define  TFT9341_RESET_ACTIVE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_RESET);
 #define  TFT9341_RESET_IDLE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_SET);
 
 void Tft9341::init() {
 //    uint32_t dtt = 0;
+    fonts = new FontSystem(this);
+    fonts->init();
 
     reset();
     HAL_Delay(1000);
@@ -20,53 +24,39 @@ void Tft9341::init() {
 //    dtt = TFT9341_ReadReg(0xD3);
 }
 
-void Tft9341::delay(uint32_t dly) {
-    uint32_t i;
-
-    for (i = 0; i < dly; i++)
-        ;
-}
-
-void Tft9341::delayMicro(__IO uint32_t micros) {
-    micros *= (SystemCoreClock / 1000000) / 5;
-
-    while (micros--)
-        ;
-}
-
 uint32_t Tft9341::readReg(uint8_t r) {
     uint32_t id;
     uint8_t x;
 
     sendCommand(r);
-    delayMicro(50);
+    delay_ms(50);
 
     x = TFT9341_ADDR_DATA;
     id = x;
     id <<= 8;
-    delayMicro(1);
+    delay_ms(1);
 
     x = TFT9341_ADDR_DATA;
     id |= x;
     id <<= 8;
-    delayMicro(1);
+    delay_ms(1);
 
     x = TFT9341_ADDR_DATA;
     id |= x;
     id <<= 8;
-    delayMicro(1);
+    delay_ms(1);
 
     x = TFT9341_ADDR_DATA;
     id |= x;
     if (r == 0xEF) {
         id <<= 8;
-        delayMicro(5);
+        delay_ms(5);
 
         x = TFT9341_ADDR_DATA;
         id |= x;
     }
 
-    delayMicro(150); //stabilization time
+    delay_ms(150); //stabilization time
 
     return id;
 }
@@ -104,7 +94,7 @@ void Tft9341::reset(void) {
 
     TFT9341_RESET_IDLE
     sendCommand(0x01); //Software Reset
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xCB); //Power Control A
     sendData(0x39);
@@ -112,78 +102,78 @@ void Tft9341::reset(void) {
     sendData(0x00);
     sendData(0x34);
     sendData(0x02);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xCF); //Power Control B
     sendData(0x00);
     sendData(0xC1);
     sendData(0x30);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xE8); //Driver timing control A
     sendData(0x85);
     sendData(0x00);
     sendData(0x78);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xEA); //Driver timing control B
     sendData(0x00);
     sendData(0x00);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xED); //Power on Sequence control
     sendData(0x64);
     sendData(0x03);
     sendData(0x12);
     sendData(0x81);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xF7); //Pump ratio control
     sendData(0x20);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xC0); //Power Control 1
     sendData(0x10);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xC1); //Power Control 2
     sendData(0x10);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xC5); //VCOM Control 1
     sendData(0x3E);
     sendData(0x28);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xC7); //VCOM Control 2
     sendData(0x86);
-    delayMicro(1);
+    delay_ms(1);
 
     setRotation(0);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0x3A); //Pixel Format Set
     sendData(0x55); //16bit
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xB1);
     sendData(0x00);
     sendData(0x18); // Частота кадров 79 Гц
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xB6); //Display Function Control
     sendData(0x08);
     sendData(0x82);
     sendData(0x27); //320 строк
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xF2); //Enable 3G (пока не знаю что это за режим)
     sendData(0x00); //не включаем
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0x26); //Gamma set
     sendData(0x01); //Gamma Curve (G2.2) (Кривая цветовой гаммы)
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xE0); //Positive Gamma  Correction
     sendData(0x0F);
@@ -201,7 +191,7 @@ void Tft9341::reset(void) {
     sendData(0x0E);
     sendData(0x09);
     sendData(0x00);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0xE1); //Negative Gamma  Correction
     sendData(0x00);
@@ -219,7 +209,7 @@ void Tft9341::reset(void) {
     sendData(0x31);
     sendData(0x36);
     sendData(0x0F);
-    delayMicro(1);
+    delay_ms(1);
 
     sendCommand(0x11); //Выйдем из спящего режим
     HAL_Delay(150);
@@ -289,12 +279,12 @@ void Tft9341::fillScreen(uint16_t color) {
     flood(color, (long) X_SIZE * (long) Y_SIZE);
 }
 
-void Tft9341::fillRectangle(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+void Tft9341::fillRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color) {
     setAddrWindow(x1, y1, x2, y2);
     flood(color, (uint16_t) (x2 - x1 + 1) * (uint16_t) (y2 - y1 + 1));
 }
 
-void Tft9341::drawPixel(int x, int y, uint16_t color) {
+void Tft9341::drawPoint(int x, int y, uint16_t color) {
     if ((x < 0) || (y < 0) || (x >= X_SIZE) || (y >= Y_SIZE)) {
         return;
     }
@@ -305,7 +295,7 @@ void Tft9341::drawPixel(int x, int y, uint16_t color) {
     sendData(color & 0xFF);
 }
 
-void Tft9341::drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+void Tft9341::drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color) {
     int steep = abs(y2 - y1) > abs(x2 - x1);
     if (steep) {
         swap(x1, y1);
@@ -332,9 +322,9 @@ void Tft9341::drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, ui
 
     for (; x1 <= x2; x1++) {
         if (steep) {
-            drawPixel(y1, x1, color);
+            drawPoint(y1, x1, color);
         } else {
-            drawPixel(x1, y1, color);
+            drawPoint(x1, y1, color);
         }
 
         err -= dy;
@@ -345,7 +335,7 @@ void Tft9341::drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, ui
     }
 }
 
-void Tft9341::drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+void Tft9341::drawRect(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color) {
     drawLine(color, x1, y1, x2, y1);
     drawLine(color, x2, y1, x2, y2);
     drawLine(color, x1, y1, x1, y2);
@@ -359,10 +349,10 @@ void Tft9341::drawCircle(uint16_t x0, uint16_t y0, int r, uint16_t color) {
     int x = 0;
     int y = r;
 
-    drawPixel(x0, y0 + r, color);
-    drawPixel(x0, y0 - r, color);
-    drawPixel(x0 + r, y0, color);
-    drawPixel(x0 - r, y0, color);
+    drawPoint(x0, y0 + r, color);
+    drawPoint(x0, y0 - r, color);
+    drawPoint(x0 + r, y0, color);
+    drawPoint(x0 - r, y0, color);
 
     while (x < y) {
         if (f >= 0) {
@@ -374,15 +364,33 @@ void Tft9341::drawCircle(uint16_t x0, uint16_t y0, int r, uint16_t color) {
         ddF_x += 2;
         f += ddF_x;
 
-        drawPixel(x0 + x, y0 + y, color);
-        drawPixel(x0 - x, y0 + y, color);
-        drawPixel(x0 + x, y0 - y, color);
-        drawPixel(x0 - x, y0 - y, color);
-        drawPixel(x0 + y, y0 + x, color);
-        drawPixel(x0 - y, y0 + x, color);
-        drawPixel(x0 + y, y0 - x, color);
-        drawPixel(x0 - y, y0 - x, color);
+        drawPoint(x0 + x, y0 + y, color);
+        drawPoint(x0 - x, y0 + y, color);
+        drawPoint(x0 + x, y0 - y, color);
+        drawPoint(x0 - x, y0 - y, color);
+        drawPoint(x0 + y, y0 + x, color);
+        drawPoint(x0 - y, y0 + x, color);
+        drawPoint(x0 + y, y0 - x, color);
+        drawPoint(x0 - y, y0 - x, color);
     }
+}
+
+void Tft9341::drawString(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, const char *str) {
+    fonts->drawString(fontSize, x, y, str);
+}
+
+void Tft9341::drawInt(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, int value) {
+    //FIXME: need to convert int
+}
+
+void Tft9341::drawString(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, const char *str, uint16_t color) {
+    //FIXME: do support colors
+    fonts->drawString(fontSize, x, y, str);
+}
+
+void Tft9341::drawInt(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, int value, uint16_t color) {
+    //FIXME: do support colors
+    //FIXME: need to convert int
 }
 
 //FIXME: rewrite it to use preloaded images

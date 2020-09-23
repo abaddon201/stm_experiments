@@ -2,7 +2,7 @@
  * zx_tap_feeder.cpp
  *
  *  Created on: 21 сент. 2020 г.
- *      Author: user
+ *      Author: Abby
  */
 
 #include "zx_tap_feeder.h"
@@ -23,7 +23,6 @@ constexpr uint8_t HI = 255;
 constexpr uint8_t LOW = 0;
 }
 
-
 bool ZxTapFeeder::nextSample(Sample &sample) {
     switch (state) {
     case State::START:
@@ -33,7 +32,6 @@ bool ZxTapFeeder::nextSample(Sample &sample) {
                 //FIXME: error handling
                 return false;
             }
-            //readedBytes+=currentByte;
         }
         blockLength = getByte() | (getByte() << 8);
         // file type and first byte of the header
@@ -72,7 +70,7 @@ bool ZxTapFeeder::nextSample(Sample &sample) {
         sample.samples = samplesCountSync2;
         break;
     case State::SYNC2:
-        bitPosition=8;
+        bitPosition = 8;
         if (byte & 128) {
             state = State::ONE;
             sample.level = HI;
@@ -86,12 +84,12 @@ bool ZxTapFeeder::nextSample(Sample &sample) {
     case State::ONE:
         sample.level = LOW;
         sample.samples = samplesCountOne;
-        state=State::NEXT_BIT;
+        state = State::NEXT_BIT;
         break;
     case State::ZERO:
         sample.level = LOW;
         sample.samples = samplesCountZero;
-        state=State::NEXT_BIT;
+        state = State::NEXT_BIT;
         break;
     case State::NEXT_BIT:
         encodeNextBit(sample);
@@ -106,10 +104,10 @@ bool ZxTapFeeder::nextSample(Sample &sample) {
     return true;
 }
 
-void ZxTapFeeder::encodeNextBit(Sample& sample) {
+void ZxTapFeeder::encodeNextBit(Sample &sample) {
     --bitPosition;
     if (bitPosition) {
-        byte<<=1;
+        byte <<= 1;
         if (byte & 128) {
             state = State::ONE;
             sample.level = HI;
@@ -128,7 +126,6 @@ void ZxTapFeeder::encodeNextBit(Sample& sample) {
                     //FIXME: error handling
                     return;
                 }
-                //readedBytes+=currentByte;
             }
             byte = getByte();
             bitPosition = 8;
@@ -158,12 +155,21 @@ int ZxTapFeeder::pulseLenToSamplesCount(int pulseLen) {
 }
 
 bool ZxTapFeeder::initFile(const char *fileName, int freq) {
-    this->freq = freq;
-    TIM4->PSC = 0;
-    TIM4->ARR = 84000000 / freq - 1;
-    if (f_open(&file, fileName, FA_READ)!=FR_OK) {
+    if (f_open(&file, fileName, FA_READ) != FR_OK) {
         //FIXME: handle errors
         return false;
     }
+    if (this->freq != freq) {
+        this->freq = freq;
+        samplesCountOne = pulseLenToSamplesCount(PULSE_LEN_ONE);
+        samplesCountPause = pulseLenToSamplesCount(PULSE_LEN_PAUSE);
+        samplesCountPilot = pulseLenToSamplesCount(PULSE_LEN_PILOT);
+        samplesCountSync1 = pulseLenToSamplesCount(PULSE_LEN_SYNC1);
+        samplesCountSync2 = pulseLenToSamplesCount(PULSE_LEN_SYNC2);
+        samplesCountSync3 = pulseLenToSamplesCount(PULSE_LEN_SYNC3);
+        samplesCountZero = pulseLenToSamplesCount(PULSE_LEN_ZERO);
+    }
+    TIM4->PSC = 0;
+    TIM4->ARR = 84000000 / freq - 1;
     return true;
 }

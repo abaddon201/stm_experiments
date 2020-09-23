@@ -86,9 +86,9 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
         uint16_t mask = 1 << (width + offset1 - 1);
         for (j = 0; j < width; j++) {
             if (line & mask) {
-                display->drawPixel(x + j, y, BLACK);
+                display->drawPoint(x + j, y, BLACK);
             } else {
-                display->drawPixel(x + j, y, WHITE);
+                display->drawPoint(x + j, y, WHITE);
             }
             mask >>= 1;
         }
@@ -107,7 +107,26 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
  }
  */
 
-void FontSystem::drawString(Font *font, uint16_t x, uint16_t y, const char *str) {
+void FontSystem::drawString(FontSize fontSize, uint16_t x, uint16_t y, const char *str) {
+    Font *font;
+    switch (fontSize) {
+    case FontSize::FONT8:
+        font = &Font8;
+        break;
+    case FontSize::FONT12:
+        font = &Font12;
+        break;
+    case FontSize::FONT16:
+        font = &Font16;
+        break;
+    case FontSize::FONT20:
+        font = &Font20;
+        break;
+    case FontSize::FONT24:
+        font = &Font24;
+        break;
+    }
+
     while (*str) {
         drawChar(font, x, y, str[0]);
         x += font->Width;

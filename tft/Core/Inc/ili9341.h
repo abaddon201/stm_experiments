@@ -1,9 +1,10 @@
 #ifndef ILI9341_H_
 #define ILI9341_H_
 
-#include <stdlib.h>
+#include"fonts.h"
 
-#include "stm32f4xx_hal.h"
+#include <stdlib.h>
+#include <stm32f4xx_hal.h>
 #include "fsmc.h"
 
 #define TFT9341_ADDR_CMD        *(uint8_t*)0x60000000
@@ -26,9 +27,8 @@
 class Tft9341 {
     uint16_t X_SIZE;
     uint16_t Y_SIZE;
+    FontSystem *fonts;
 
-    void delay(uint32_t dly);
-    void delayMicro(__IO uint32_t micros);
     uint32_t readReg(uint8_t r);
 
     inline void sendCommand(unsigned char cmd) {
@@ -54,17 +54,27 @@ public:
 
     //display control
     void setRotation(unsigned char r);
+
     uint16_t xSize() {
         return X_SIZE;
     }
 
+    uint16_t ySize() {
+        return Y_SIZE;
+    }
+
     // primitive drawings
     void fillScreen(uint16_t color);
-    void fillRectangle(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-    void drawPixel(int x, int y, uint16_t color);
-    void drawLine(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-    void drawRect(uint16_t color, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+    void fillRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+    void drawPoint(int x, int y, uint16_t color);
+    void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
+    void drawRect(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
     void drawCircle(uint16_t x0, uint16_t y0, int r, uint16_t color);
+    void drawString(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, const char *str);
+    void drawInt(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, int value);
+
+    void drawString(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, const char *str, uint16_t color);
+    void drawInt(FontSystem::FontSize fontSize, uint16_t x, uint16_t y, int value, uint16_t color);
 };
 
 #endif /* ILI9341_H_ */ 

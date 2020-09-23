@@ -15,6 +15,10 @@ class Tft9341;
 class FontSystem {
     Tft9341 *display;
 public:
+    enum class FontSize {
+        FONT8, FONT12, FONT16, FONT20, FONT24
+    };
+
     struct Font {
         uint16_t Width;
         uint16_t Height;
@@ -37,7 +41,7 @@ public:
     void loadFont(struct Font *font, uint16_t w, uint16_t h, const char *fname);
 
     void drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s);
-    void drawString(Font *font, uint16_t x, uint16_t y, const char *str);
+    void drawString(FontSize fontSize, uint16_t x, uint16_t y, const char *str);
 };
 
 #endif /* INC_FONTS_H_ */
