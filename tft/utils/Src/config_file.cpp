@@ -5,7 +5,7 @@
  *      Author: Abby
  */
 
-#include "../../_utils/Inc/config_file.h"
+#include "config_file.h"
 
 #include <string.h>
 

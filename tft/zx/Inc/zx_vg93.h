@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "../../_zx/Inc/zx_disk_feeder.h"
+#include "zx_disk_feeder.h"
 
 #define VERSION "v0.05"
 

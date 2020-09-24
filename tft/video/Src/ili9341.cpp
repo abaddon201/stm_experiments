@@ -5,9 +5,9 @@
  *      Author: Abby
  */
 
-#include "../../_video/Inc/ili9341.h"
+#include "ili9341.h"
 
-#include "../../_utils/Inc/delay.h"
+#include "delay.h"
 
 #define  TFT9341_RESET_ACTIVE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_RESET);
 #define  TFT9341_RESET_IDLE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_SET);

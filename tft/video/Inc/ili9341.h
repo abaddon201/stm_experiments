@@ -5,7 +5,7 @@
 #include <stm32f4xx_hal.h>
 #include "fsmc.h"
 
-#include "../../_video/Inc/fonts.h"
+#include "fonts.h"
 
 #define TFT9341_ADDR_CMD        *(uint8_t*)0x60000000
 #define TFT9341_ADDR_DATA        *(uint8_t*)0x60010000

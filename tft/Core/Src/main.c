@@ -33,7 +33,7 @@
 /* USER CODE BEGIN Includes */
 #include <cmsis_os2.h>
 
-#include "../../_utils/Inc/base.h"
+#include "base.h"
 
 /* USER CODE END Includes */
 

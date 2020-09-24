@@ -5,12 +5,12 @@
  *      Author: Abby
  */
 
-#include "../../_zx/Inc/zx_trd_feeder.h"
+#include "zx_trd_feeder.h"
 
 #include <string.h>
 
-#include "../../_utils/Inc/crc16.h"
-#include "../../_zx/Inc/zx_disk_feeder.h"
+#include "crc16.h"
+#include "zx_disk_feeder.h"
 
 #define BITRATE1 0x00FA
 #define BITRATE2 0x01F4

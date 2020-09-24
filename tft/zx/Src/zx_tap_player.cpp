@@ -5,14 +5,14 @@
  *      Author: Abby
  */
 
-#include "../../_zx/Inc/zx_tap_player.h"
+#include "zx_tap_player.h"
 
 #include <math.h>
 #include <stm32f4xx_hal.h>
 #include "tim.h"
 #include "dac.h"
 
-#include "../../_zx/Inc/zx_tap_feeder.h"
+#include "zx_tap_feeder.h"
 
 namespace {
 ZxTapPlayer *_player;

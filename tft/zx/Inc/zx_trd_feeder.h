@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "../../_zx/Inc/zx_disk_feeder.h"
+#include "zx_disk_feeder.h"
 
 class ZxTrdFeeder: public ZxDiskFeeder {
 public:
@@ -22,4 +22,5 @@ public:
     bool init() override;
 
 };
+
 #endif /* INC_ZX_TRD_FEEDER_H_ */

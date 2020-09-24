@@ -5,7 +5,7 @@
  *      Author: Abby
  */
 
-#include "../../_zx/Inc/zx_core.h"
+#include "zx_core.h"
 
 #include <stm32f407xx.h>
 

@@ -12,7 +12,7 @@
 
 #define TAP_DMA_BUFFER_SIZE 8192
 
-#include "../../_zx/Inc/zx_tap_sample.h"
+#include "zx_tap_sample.h"
 
 class ZxTapFeeder;
 class ZxTapPlayer {
