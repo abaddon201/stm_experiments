@@ -15,31 +15,31 @@
 #include "../../_zx/Inc/zx_tap_feeder.h"
 
 namespace {
-ZxTapPlayer* _player;
+ZxTapPlayer *_player;
 }
 
 extern "C" {
-    /**
-     * @brief  Conversion complete callback in non blocking mode for Channel1
-     * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
-     *         the configuration information for the specified DAC.
-     * @retval None
-     */
-    void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdac) {
-        /* Prevent unused argument(s) compilation warning */
-        _player->fillBuffer(1);
-    }
+/**
+ * @brief  Conversion complete callback in non blocking mode for Channel1
+ * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
+ *         the configuration information for the specified DAC.
+ * @retval None
+ */
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac) {
+    /* Prevent unused argument(s) compilation warning */
+    _player->fillBuffer(1);
+}
 
-    /**
-     * @brief  Conversion half DMA transfer callback in non blocking mode for Channel1
-     * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
-     *         the configuration information for the specified DAC.
-     * @retval None
-     */
-    void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef* hdac) {
-        /* Prevent unused argument(s) compilation warning */
-        _player->fillBuffer(0);
-    }
+/**
+ * @brief  Conversion half DMA transfer callback in non blocking mode for Channel1
+ * @param  hdac pointer to a DAC_HandleTypeDef structure that contains
+ *         the configuration information for the specified DAC.
+ * @retval None
+ */
+void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac) {
+    /* Prevent unused argument(s) compilation warning */
+    _player->fillBuffer(0);
+}
 
 }
 
@@ -48,7 +48,7 @@ void ZxTapPlayer::fillBuffer(int part) {
         stop();
         return;
     }
-    uint8_t* buffer = &(dmaBuffer[part * (TAP_DMA_BUFFER_SIZE / 2)]);
+    uint8_t *buffer = &(dmaBuffer[part * (TAP_DMA_BUFFER_SIZE / 2)]);
     int position = 0;
     if (currentSample.samples) {
         while (currentSample.samples != 0) {
@@ -78,7 +78,7 @@ void ZxTapPlayer::fillBuffer(int part) {
     }
 }
 
-void ZxTapPlayer::play(ZxTapFeeder* feeder) {
+void ZxTapPlayer::play(ZxTapFeeder *feeder) {
     _player = this;
     this->feeder = feeder;
     fileEnded = false;
@@ -110,4 +110,5 @@ void ZxTapPlayer::stop() {
     HAL_TIM_Base_Stop(&htim4);
 }
 
-ZxTapPlayer::ZxTapPlayer() {}
+ZxTapPlayer::ZxTapPlayer() {
+}
