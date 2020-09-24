@@ -15,8 +15,8 @@
 #include "../../_utils/Inc/crc16.h"
 #include "../../_zx/Inc/zx_disk_feeder.h"
 
-//const uint16_t R0R1_ARR[] = { 600, 1200, 2000, 3000 };
-const uint16_t R0R1_ARR[] = { 1, 600, 1400, 2400 }; // коррекция на выполнение Load_Cylinder (6-7 мс)
+ //const uint16_t R0R1_ARR[] = { 600, 1200, 2000, 3000 };
+const uint16_t R0R1_ARR[] = {1, 600, 1400, 2400}; // коррекция на выполнение Load_Cylinder (6-7 мс)
 
 #pragma pack(1)
 volatile uint8_t Regs[4];
@@ -26,7 +26,7 @@ volatile uint8_t CMD_R;
 volatile uint8_t DSR;
 volatile uint8_t VTRACK_R;
 extern volatile bool bNewCMD;
-extern volatile uint8_t *ADDRPointer;
+extern volatile uint8_t* ADDRPointer;
 
 #define STAT_R  Regs[0]
 #define TRACK_R Regs[1]
@@ -61,9 +61,9 @@ uint8_t CMD_TYPE;
 uint16_t Sec_Length;
 signed char DIRC;   // 1 или -1
 volatile bool Wr_Sync;
-volatile uint32_t *DWPointer;
-volatile uint8_t *SYNCPointer;
-volatile uint8_t *ADDRPointer;
+volatile uint32_t* DWPointer;
+volatile uint8_t* SYNCPointer;
+volatile uint8_t* ADDRPointer;
 volatile uint32_t temp2;
 volatile bool INT_CMD;
 uint8_t PREV_DATA;
@@ -73,17 +73,17 @@ extern volatile uint32_t Curr_Byte;
 extern volatile uint8_t IP_Counter;
 extern volatile bool Next_Byte;
 
-void xprintf(const char *msg) {
+void xprintf(const char* msg) {
     //TODO: log to somewhere
 }
 
-void vg93Task(void *params) {
-    ZxVg93 zxVg93 { };
+void vg93Task(void* params) {
+    ZxVg93 zxVg93{ };
     zxVg93.mainLoop();
 }
 
 void ZxVg93::mainLoop() {
-    STAT_R= 0;
+    STAT_R = 0;
     //strcpy(sCurrDir, "/");
     pickNLoad();
     while (1) {
@@ -106,7 +106,7 @@ void ZxVg93::mainLoop() {
         }
         //
         switch (CMD_TYPE) {
-            case 0:
+        case 0:
             // остановка после 15 оборотов в IDLE
             if (IP_Counter >= 15) {
                 dataTimerStop();
@@ -117,50 +117,50 @@ void ZxVg93::mainLoop() {
             }
             break;
 
-            case 1:
+        case 1:
             if ((pCTRL->IDR & EM_DISK_NUM) == 0) {
                 execAccurateTypeI();
             }
-//              else
-//                  ExecFast_TypeI();
-            //
+            //              else
+            //                  ExecFast_TypeI();
+                        //
             if (VTRACK_R == 0) {
                 fTR00 = TR00;
             } else {
                 fTR00 = 0;
             }
             //
-            STAT_R= fBusy | fIndex | fTR00 | fCRC_ERR | fSEEK_ERR | fHLD_HLT | fWRPT;
+            STAT_R = fBusy | fIndex | fTR00 | fCRC_ERR | fSEEK_ERR | fHLD_HLT | fWRPT;
             break;
 
-            case 2:
+        case 2:
             if ((pCTRL->IDR & EM_DISK_NUM) == 0) {
                 execAccurateTypeII();
             }
-//              else
-//                  ExecFast_TypeII();
-            STAT_R= fBusy | fDRQ | fLOST | fCRC_ERR | fREC_NF | fWFAULT | fREC_TYP | fWRPT;
+            //              else
+            //                  ExecFast_TypeII();
+            STAT_R = fBusy | fDRQ | fLOST | fCRC_ERR | fREC_NF | fWFAULT | fREC_TYP | fWRPT;
             break;
 
-            case 3:
+        case 3:
             if ((pCTRL->IDR & EM_DISK_NUM) == 0) {
                 execAccurateTypeIII();
             }
-//              else
-//                  ExecFast_TypeIII();
-            STAT_R= fBusy | fDRQ | fLOST | fCRC_ERR | fREC_NF | fWFAULT | fREC_TYP | fWRPT;
+            //              else
+            //                  ExecFast_TypeIII();
+            STAT_R = fBusy | fDRQ | fLOST | fCRC_ERR | fREC_NF | fWFAULT | fREC_TYP | fWRPT;
             break;
 
-            case 4:
+        case 4:
             if ((pCTRL->IDR & EM_DISK_NUM) == 0) {
                 execAccurateTypeIV();
             }
-//              else
-//                  ExecFast_TypeIV();
-            STAT_R= fBusy | fDRQ | fLOST | fCRC_ERR | fREC_NF | fWFAULT | fREC_TYP | fWRPT;
+            //              else
+            //                  ExecFast_TypeIV();
+            STAT_R = fBusy | fDRQ | fLOST | fCRC_ERR | fREC_NF | fWFAULT | fREC_TYP | fWRPT;
             break;
 
-            default: break;
+        default: break;
         }
     }
 }
@@ -169,8 +169,8 @@ void ZxVg93::pickNLoad() {
     long int i = 0;
 
     while (i == 0) {
-//        ChooseDiskImage();
-        //FIXME: provide name from UI
+        //        ChooseDiskImage();
+                //FIXME: provide name from UI
         if (disk->parseImageFile("test.mfd")) {
             if (disk->isReadonly()) {
                 fWRPT = WRPT;
@@ -186,7 +186,7 @@ void ZxVg93::pickNLoad() {
 void ZxVg93::initializeEM() {
     PortReset = false;
     dataTimerStop();
-//
+    //
     fBusy = 0;
     fIndex = 0;
     fTR00 = 0;
@@ -194,23 +194,23 @@ void ZxVg93::initializeEM() {
     fSEEK_ERR = 0;
     fHLD_HLT = 0;
     fWRPT = 0;
-//
+    //
     fDRQ = 0;
     fLOST = 0;
     fREC_NF = 0;
     fWFAULT = 0;
     fREC_TYP = 0;
-//
+    //
     DIRC = -1;
     CMD_R = 0x03;
-    SECT_R= 1;
-    DATA_R= 0;
-    TRACK_R= 0;
+    SECT_R = 1;
+    DATA_R = 0;
+    TRACK_R = 0;
     VTRACK_R = 0;
     CMD_TYPE = 1;
     CURR_STATE = 1;
     bNewCMD = false;
-//
+    //
     while ((pCTRL->IDR & EM_RESET) == 0)
         ;
 }
@@ -261,7 +261,7 @@ void ZxVg93::execAccurateTypeI() {
     case 4:
         if ((CMD_R & 0xF0) == 0) {
             // not SEEK (не Поиск)
-            if ( TRACK_R<= disk->maxCylinder() && TRACK_R >= 0 ) {
+            if (TRACK_R <= disk->maxCylinder() && TRACK_R >= 0) {
                 VTRACK_R = TRACK_R;
             } else {
                 VTRACK_R = 0;
@@ -272,16 +272,16 @@ void ZxVg93::execAccurateTypeI() {
         CURR_STATE++;
         break;
 
-        case 5:
+    case 5:
         DSR = DATA_R;
         CURR_STATE++;
         break;
 
-        case 6:
-        if ( TRACK_R== DSR ) {
+    case 6:
+        if (TRACK_R == DSR) {
             CURR_STATE = 12;
         } else {
-            if ( DSR > TRACK_R ) {
+            if (DSR > TRACK_R) {
                 DIRC = 1;
             } else {
                 DIRC = -1;
@@ -290,9 +290,9 @@ void ZxVg93::execAccurateTypeI() {
         }
         break;
 
-        case 7:
+    case 7:
         // B
-        TRACK_R+= DIRC;
+        TRACK_R += DIRC;
         if (DIRC == 1 && VTRACK_R == disk->maxCylinder()) {
             ;
         } else if (DIRC == -1 && VTRACK_R == 0) {
@@ -303,29 +303,29 @@ void ZxVg93::execAccurateTypeI() {
         CURR_STATE++;
         break;
 
-        case 8:
+    case 8:
         // C
         if (VTRACK_R == 0 && DIRC == -1) {
-//              fTR00 == TR00;
-            TRACK_R= 0;
+            //              fTR00 == TR00;
+            TRACK_R = 0;
             CURR_STATE = 12;
         } else {
             CURR_STATE++;
         }
         break;
 
-        case 9:
+    case 9:
         delayStart(R0R1_ARR[CMD_R & CMDI_R01]);
         CURR_STATE++;
         break;
 
-        case 10:
-        if (( TIM6->CR1 & TIM_CR1_CEN) == 0) {
+    case 10:
+        if ((TIM6->CR1 & TIM_CR1_CEN) == 0) {
             CURR_STATE++;
         }
         break;
 
-        case 11:
+    case 11:
         if (CMD_R & CMD765) {
             // STEP-IN (Шаг вперед) или STEP-OUT (Шаг назад) или STEP (Шаг)
             CURR_STATE++;
@@ -334,7 +334,7 @@ void ZxVg93::execAccurateTypeI() {
         }
         break;
 
-        case 12:
+    case 12:
         if (disk->unsavedCylinder()) {
             disk->saveCylinder();
         }
@@ -346,28 +346,28 @@ void ZxVg93::execAccurateTypeI() {
         }
         break;
 
-        case 13:
+    case 13:
         if (!HLD) {
             dataTimerStart();
         }
-//            else
-//               IP_Counter = 0;
+        //            else
+        //               IP_Counter = 0;
         delayStart(3000);// при тактовой 1 Мгц
         CURR_STATE++;
         break;
 
-        case 14:
-        if (( TIM6->CR1 & TIM_CR1_CEN) == 0) {
+    case 14:
+        if ((TIM6->CR1 & TIM_CR1_CEN) == 0) {
             CURR_STATE++;
         }
         break;
 
-        case 15:
+    case 15:
         IP_Counter = 0;
         CURR_STATE++;
         break;
 
-        case 16:
+    case 16:
         if (IP_Counter > 5) {
             fSEEK_ERR = SEEK_ERR;
             CURR_STATE = 19;
@@ -376,12 +376,12 @@ void ZxVg93::execAccurateTypeI() {
         }
         break;
 
-        case 17:
+    case 17:
         if (Next_Byte) {
             Next_Byte = false;
             temp2 = Curr_Byte;
             SYNCPointer = disk->buffer() + MAX_TRACK_LEN + (Curr_Byte >> 3);
-            if (( pCTRL->IDR & EM_SIDE) == 0) {
+            if ((pCTRL->IDR & EM_SIDE) == 0) {
                 temp2 += MAX_TRACK_LEN + MAX_BF_LEN;
                 SYNCPointer += MAX_TRACK_LEN + MAX_BF_LEN;
             }
@@ -389,20 +389,20 @@ void ZxVg93::execAccurateTypeI() {
             if (*DWPointer == IAM && (*SYNCPointer & 1 << (Curr_Byte & 7)) != 0) {
                 if (*((uint8_t*) DWPointer + 4) == TRACK_R) {
                     CRCReset = true;
-                    crc16( 0xA1 );
-                    ADDRPointer = (uint8_t*)DWPointer + 1;
+                    crc16(0xA1);
+                    ADDRPointer = (uint8_t*) DWPointer + 1;
                     CURR_STATE++;
                 }
             }
         }
         break;
 
-        case 18:
+    case 18:
         if (Next_Byte) {
             Next_Byte = false;
             if (CRC16_Byte_Counter == 8) {
                 if (*ADDRPointer == (uint8_t) (CRC16_value >> 8)
-                && *(++ADDRPointer) == (uint8_t) (CRC16_value & 0x00FF)) {
+                    && *(++ADDRPointer) == (uint8_t) (CRC16_value & 0x00FF)) {
                     fCRC_ERR = 0;
                     CURR_STATE++;
                 } else {
@@ -415,14 +415,14 @@ void ZxVg93::execAccurateTypeI() {
         }
         break;
 
-        case 19:
+    case 19:
         fBusy = 0;
         pCTRL->BSRR = EM_INTRQ;    // установка
         CURR_STATE = 0;
         CMD_TYPE = 0;
         break;
 
-        case 20:
+    case 20:
         if (CMD_R & CMDI_u) {
             CURR_STATE = 7;
         } else {
@@ -430,7 +430,7 @@ void ZxVg93::execAccurateTypeI() {
         }
         break;
 
-        default:
+    default:
         break;
     }
 }
@@ -469,7 +469,7 @@ void ZxVg93::execAccurateTypeII() {
         break;
 
     case 4:
-        if (( TIM6->CR1 & TIM_CR1_CEN) == 0) {
+        if ((TIM6->CR1 & TIM_CR1_CEN) == 0) {
             CURR_STATE++;
         }
         break;
@@ -513,18 +513,18 @@ void ZxVg93::execAccurateTypeII() {
             }
             DWPointer = (uint32_t*) (disk->buffer() + temp2);
             if (*DWPointer == IAM && (*SYNCPointer & 1 << (Curr_Byte & 7)) != 0) {
-                if (*((uint8_t*) DWPointer + 4) == TRACK_R&& ((*((uint8_t*)DWPointer + 5) == ( ( CMD_R & CMDII_s ) != 0 ) ) ||
-                        ( ( CMD_R & CMDII_C ) == 0 ) ) &&
-                *((uint8_t*)DWPointer + 6) == SECT_R ) {
-                    switch ( *((uint8_t*)DWPointer + 7) & 3 ) {
-                        case 0: Sec_Length = 128; break;
-                        case 1: Sec_Length = 256; break;
-                        case 2: Sec_Length = 512; break;
-                        default: Sec_Length = 1024;
+                if (*((uint8_t*) DWPointer + 4) == TRACK_R && ((*((uint8_t*) DWPointer + 5) == ((CMD_R & CMDII_s) != 0)) ||
+                    ((CMD_R & CMDII_C) == 0)) &&
+                    *((uint8_t*) DWPointer + 6) == SECT_R) {
+                    switch (*((uint8_t*) DWPointer + 7) & 3) {
+                    case 0: Sec_Length = 128; break;
+                    case 1: Sec_Length = 256; break;
+                    case 2: Sec_Length = 512; break;
+                    default: Sec_Length = 1024;
                     }
                     CRCReset = true;
-                    crc16( 0xA1 );
-                    ADDRPointer = (uint8_t*)DWPointer + 1;
+                    crc16(0xA1);
+                    ADDRPointer = (uint8_t*) DWPointer + 1;
                     CURR_STATE++;
                 } else {
                     CURR_STATE--;
@@ -535,19 +535,19 @@ void ZxVg93::execAccurateTypeII() {
         }
         break;
 
-        case 9:
-        if ( Next_Byte ) {
+    case 9:
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 8 ) {
-                if ( *ADDRPointer == (uint8_t)( CRC16_value >> 8 ) ) {
-                    CRCL_Saved = (uint8_t)( CRC16_value & 0x00FF );
+            if (CRC16_Byte_Counter == 8) {
+                if (*ADDRPointer == (uint8_t) (CRC16_value >> 8)) {
+                    CRCL_Saved = (uint8_t) (CRC16_value & 0x00FF);
                     fCRC_ERR = 0;
                 } else {
                     fCRC_ERR = CRC_ERR;
                     CURR_STATE = 7;
                 }
-            } else if ( CRC16_Byte_Counter == 9 ) {
-                if ( *ADDRPointer == CRCL_Saved ) {
+            } else if (CRC16_Byte_Counter == 9) {
+                if (*ADDRPointer == CRCL_Saved) {
                     fCRC_ERR = 0;
                     CURR_STATE++;
                 } else {
@@ -555,12 +555,12 @@ void ZxVg93::execAccurateTypeII() {
                     CURR_STATE = 7;
                 }
             }
-            crc16( *ADDRPointer++ );
+            crc16(*ADDRPointer++);
         }
         break;
 
-        case 10:
-        if ( CMD_R & CMD5 ) {
+    case 10:
+        if (CMD_R & CMD5) {
             disk->setUnsavedCylinder(true);
             CURR_STATE = 15;    // запись сектора
         } else {
@@ -568,72 +568,72 @@ void ZxVg93::execAccurateTypeII() {
         }
         break;
 
-        case 11:    // 2
-        if ( Next_Byte ) {
+    case 11:    // 2
+        if (Next_Byte) {
             Next_Byte = false;
             temp2 = Curr_Byte;
-            SYNCPointer = disk->buffer() + MAX_TRACK_LEN + ( Curr_Byte >> 3 );
-            if ( ( pCTRL->IDR & EM_SIDE ) == 0 ) {
+            SYNCPointer = disk->buffer() + MAX_TRACK_LEN + (Curr_Byte >> 3);
+            if ((pCTRL->IDR & EM_SIDE) == 0) {
                 temp2 += MAX_TRACK_LEN + MAX_BF_LEN;
                 SYNCPointer += MAX_TRACK_LEN + MAX_BF_LEN;
             }
-            DWPointer = (uint32_t*)(disk->buffer() + temp2);
-            if ((*DWPointer & IDAM ) == IDAM && (*SYNCPointer & 1<<(Curr_Byte & 7) ) != 0 ) {
-                if ( *((uint8_t*)DWPointer + 3) == 0xF8 ) {
+            DWPointer = (uint32_t*) (disk->buffer() + temp2);
+            if ((*DWPointer & IDAM) == IDAM && (*SYNCPointer & 1 << (Curr_Byte & 7)) != 0) {
+                if (*((uint8_t*) DWPointer + 3) == 0xF8) {
                     fREC_TYP = REC_TYP;
                 } else {
                     fREC_TYP = 0;
                 }
                 CRCReset = true;
-                crc16( 0xA1 );
-                ADDRPointer = (uint8_t*)DWPointer + 1;
+                crc16(0xA1);
+                ADDRPointer = (uint8_t*) DWPointer + 1;
                 CURR_STATE++;
             }
-        } else if ( IP_Counter > 5 ) {
+        } else if (IP_Counter > 5) {
             CURR_STATE = 7;
         }
         break;
 
-        case 12:
-        if ( Next_Byte ) {
+    case 12:
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 4 ) {
+            if (CRC16_Byte_Counter == 4) {
                 CURR_STATE++;
             } else {
-                crc16( *ADDRPointer++ );
+                crc16(*ADDRPointer++);
             }
-        } else if ( IP_Counter > 5 ) {
+        } else if (IP_Counter > 5) {
             CURR_STATE = 7;
         }
         break;
 
-        case 13:
-        if ( Next_Byte ) {
+    case 13:
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == Sec_Length + 4 ) {
-                if ( *ADDRPointer++ == (uint8_t)( CRC16_value >> 8 ) &&
-                *ADDRPointer == (uint8_t)( CRC16_value & 0x00FF ) ) {
+            if (CRC16_Byte_Counter == Sec_Length + 4) {
+                if (*ADDRPointer++ == (uint8_t) (CRC16_value >> 8) &&
+                    *ADDRPointer == (uint8_t) (CRC16_value & 0x00FF)) {
                     fCRC_ERR = 0;
                     CURR_STATE++;
                 } else {
                     fCRC_ERR = CRC_ERR;
                     CURR_STATE = 24; // выход
                 }
-            } else if ( pCTRL->IDR & EM_DRQ ) {
+            } else if (pCTRL->IDR & EM_DRQ) {
                 fLOST = LOST;
             } else {
                 DATA_R = *ADDRPointer;
-                crc16( *ADDRPointer++ );
+                crc16(*ADDRPointer++);
                 pCTRL->BSRR = EM_DRQ;  // установка
                 fDRQ = DRQ;
             }
-        } else if ( IP_Counter > 5 ) {
+        } else if (IP_Counter > 5) {
             CURR_STATE = 7;
         }
         break;
 
-        case 14:    // 5
-        if ( CMD_R & CMDII_m ) {
+    case 14:    // 5
+        if (CMD_R & CMDII_m) {
             SECT_R++;
             CURR_STATE = 6;
         } else {
@@ -641,144 +641,144 @@ void ZxVg93::execAccurateTypeII() {
         }
         break;
 
-        case 15:    // 3
-        if ( Next_Byte ) {
+    case 15:    // 3
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 12 ) {
+            if (CRC16_Byte_Counter == 12) {
                 // пропустим 2 байта
                 pCTRL->BSRR = EM_DRQ;// Установка DRQ
                 fDRQ = DRQ;
                 CURR_STATE++;
             }
-            crc16( *ADDRPointer++ );
+            crc16(*ADDRPointer++);
         }
         break;
 
-        case 16:
-        if ( Next_Byte ) {
+    case 16:
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 20 ) {
+            if (CRC16_Byte_Counter == 20) {
                 // пропустим 8 байт
-                if ( pCTRL->IDR & EM_DRQ ) {
+                if (pCTRL->IDR & EM_DRQ) {
                     fLOST = LOST;
                     CURR_STATE = 24; // выход
                 } else {
                     CURR_STATE++;
                 }
             }
-            crc16( *ADDRPointer++ );
+            crc16(*ADDRPointer++);
         }
         break;
 
-        case 17:
-        if ( Next_Byte ) {
+    case 17:
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 32 ) {
+            if (CRC16_Byte_Counter == 32) {
                 // конец зазора 0x4E
                 *ADDRPointer = 0;
                 CURR_STATE++;
             }
-            crc16( *ADDRPointer++ );
+            crc16(*ADDRPointer++);
         }
         break;
 
-        case 18:
+    case 18:
         // чистка полей SYNCPointer где ???!!!
-        if ( Next_Byte ) {
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 44 ) {
+            if (CRC16_Byte_Counter == 44) {
                 // 12 нулей
                 CRCReset = true;
-                SYNCPointer = disk->buffer() + MAX_TRACK_LEN + ( ( ADDRPointer - disk->buffer() ) >> 3 );
-                if ((pCTRL->IDR & EM_SIDE ) == 0 ) {
+                SYNCPointer = disk->buffer() + MAX_TRACK_LEN + ((ADDRPointer - disk->buffer()) >> 3);
+                if ((pCTRL->IDR & EM_SIDE) == 0) {
                     SYNCPointer += MAX_TRACK_LEN + MAX_BF_LEN;
                 }
-                *SYNCPointer = 1 << ( (uint32_t)(ADDRPointer - disk->buffer()) & 7 );
-                crc16( 0xA1 );
+                *SYNCPointer = 1 << ((uint32_t) (ADDRPointer - disk->buffer()) & 7);
+                crc16(0xA1);
                 *ADDRPointer++ = 0xA1;
                 CURR_STATE++;
             } else {
                 *ADDRPointer++ = 0;
-                crc16( 0 );
+                crc16(0);
             }
         }
         break;
 
-        case 19:
-        if ( Next_Byte ) {
+    case 19:
+        if (Next_Byte) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == 3 ) {
-                if ( CMD_R & CMDII_A0 ) {
+            if (CRC16_Byte_Counter == 3) {
+                if (CMD_R & CMDII_A0) {
                     *ADDRPointer++ = 0xF8;
-                    crc16( 0xF8 );
+                    crc16(0xF8);
                 } else {
                     *ADDRPointer++ = 0xFB;
-                    crc16( 0xFB );
+                    crc16(0xFB);
                 }
                 CURR_STATE++;
             } else {
                 *ADDRPointer++ = 0xA1;
-                crc16( 0xA1 );
+                crc16(0xA1);
             }
         }
         break;
 
-        case 20:
-        if ( Next_Byte ) {
+    case 20:
+        if (Next_Byte) {
             Next_Byte = false;
             pCTRL->BSRR = EM_DRQ;  // Установка DRQ
             fDRQ = DRQ;
             *ADDRPointer++ = DATA_R;
-            crc16( DATA_R );
+            crc16(DATA_R);
             CURR_STATE++;
         }
         break;
 
-        case 21:
-        if ( Next_Byte ) {
+    case 21:
+        if (Next_Byte) {
             Next_Byte = false;
-            if (CRC16_Byte_Counter == Sec_Length + 4 ) {
-                *ADDRPointer++ = (uint8_t)( CRC16_value >> 8 );
-                CRCL_Saved = (uint8_t)( CRC16_value & 0x00FF );
-                crc16( (uint8_t)( CRC16_value >> 8 ) );
+            if (CRC16_Byte_Counter == Sec_Length + 4) {
+                *ADDRPointer++ = (uint8_t) (CRC16_value >> 8);
+                CRCL_Saved = (uint8_t) (CRC16_value & 0x00FF);
+                crc16((uint8_t) (CRC16_value >> 8));
                 CURR_STATE++;
             } else if (pCTRL->IDR & EM_DRQ) {
                 fLOST = LOST;
                 *ADDRPointer++ = 0;
-                crc16( 0 );
+                crc16(0);
             } else {
                 pCTRL->BSRR = EM_DRQ;  // Установка DRQ
                 fDRQ = DRQ;
                 *ADDRPointer++ = DATA_R;
-                crc16( DATA_R );
+                crc16(DATA_R);
             }
         }
         break;
 
-        case 22:
-        if ( Next_Byte ) {
+    case 22:
+        if (Next_Byte) {
             Next_Byte = false;
             *ADDRPointer++ = CRCL_Saved;
             CURR_STATE++;
         }
         break;
 
-        case 23:
-        if ( Next_Byte ) {
+    case 23:
+        if (Next_Byte) {
             Next_Byte = false;
             *ADDRPointer++ = 0xFF;
             CURR_STATE = 14;
         }
         break;
 
-        case 24:
+    case 24:
         fBusy = 0;
         pCTRL->BSRR = EM_INTRQ;    // установка
         CURR_STATE = 0;
         CMD_TYPE = 0;
         break;
 
-        default: break;
+    default: break;
     }
 }
 
@@ -816,7 +816,7 @@ void ZxVg93::execAccurateTypeIII() {
         break;
 
     case 4:
-        if (( TIM6->CR1 & TIM_CR1_CEN) == 0) {
+        if ((TIM6->CR1 & TIM_CR1_CEN) == 0) {
             CURR_STATE++;
         }
         break;
@@ -877,16 +877,16 @@ void ZxVg93::execAccurateTypeIII() {
             } else if ((CRC16_Byte_Counter > 3) && (CRC16_Byte_Counter < 10)) {
                 if (CRC16_Byte_Counter == 8) {
                     if (*ADDRPointer == (uint8_t) (CRC16_value >> 8)
-                            && *(ADDRPointer + 1) == (uint8_t) (CRC16_value & 0x00FF)) {
+                        && *(ADDRPointer + 1) == (uint8_t) (CRC16_value & 0x00FF)) {
                         fCRC_ERR = 0;
                     } else {
                         fCRC_ERR = CRC_ERR;
                     }
                 }
                 if (CRC16_Byte_Counter == 4) {
-                    SECT_R= *ADDRPointer;
+                    SECT_R = *ADDRPointer;
                 }
-                DATA_R= *ADDRPointer;
+                DATA_R = *ADDRPointer;
                 pCTRL->BSRR = EM_DRQ;  // установка
                 fDRQ = DRQ;
             }
@@ -904,7 +904,7 @@ void ZxVg93::execAccurateTypeIII() {
                 ADDRPointer = disk->buffer();
                 if ((pCTRL->IDR & EM_SIDE) == 0)
                     ADDRPointer += MAX_TRACK_LEN + MAX_BF_LEN;
-                DATA_R= *ADDRPointer++;
+                DATA_R = *ADDRPointer++;
                 pCTRL->BSRR = EM_DRQ;  // установка
                 fDRQ = DRQ;
                 CURR_STATE++;
@@ -923,7 +923,7 @@ void ZxVg93::execAccurateTypeIII() {
                 if ((pCTRL->IDR & EM_SIDE) == 0) {
                     ADDRPointer += MAX_TRACK_LEN + MAX_BF_LEN;
                 }
-                DATA_R= *ADDRPointer++;
+                DATA_R = *ADDRPointer++;
                 pCTRL->BSRR = EM_DRQ;  // установка
                 fDRQ = DRQ;
             } else {
@@ -937,7 +937,7 @@ void ZxVg93::execAccurateTypeIII() {
         if (fWRPT != 0) {
             CURR_STATE = 18;    // выход
         } else {
-//pCTRL->BSRRL = EM_TST;
+            //pCTRL->BSRRL = EM_TST;
             if ((pCTRL->IDR & EM_SIDE) == 0) {
                 DWPointer = (uint32_t*) (disk->buffer() + MAX_TRACK_LEN * 2 + MAX_BF_LEN);
             } else {
@@ -946,7 +946,7 @@ void ZxVg93::execAccurateTypeIII() {
             for (j = 0; j < MAX_BF_LEN / 4; j++) {
                 *DWPointer++ = 0;   // 21 мкс
             }
-//pCTRL->BSRRH = EM_TST;
+            //pCTRL->BSRRH = EM_TST;
             pCTRL->BSRR = EM_DRQ;  // установка
             fDRQ = DRQ;
             CRCReset = true;
@@ -983,24 +983,23 @@ void ZxVg93::execAccurateTypeIII() {
                     ADDRPointer += MAX_TRACK_LEN + MAX_BF_LEN;
                     SYNCPointer += MAX_TRACK_LEN + MAX_BF_LEN;
                 }
-                switch ( DATA_R)
-                {
-                    case 0xF5:
+                switch (DATA_R) {
+                case 0xF5:
                     *ADDRPointer = 0xA1;
-                    if ( PREV_DATA != 0xA1 ) {
+                    if (PREV_DATA != 0xA1) {
                         *SYNCPointer = 1;   // INDEX_START = 0 и не изменяется
                         CRCReset = true;
                     }
-                    crc16( 0xA1 );
+                    crc16(0xA1);
                     PREV_DATA = 0xA1;
                     CURR_STATE += 2;
                     pCTRL->BSRR = EM_DRQ;  // установка
                     fDRQ = DRQ;
                     break;
 
-                    case 0xF6:
+                case 0xF6:
                     *ADDRPointer = 0xC2;
-                    if ( PREV_DATA != 0xC2 ) {
+                    if (PREV_DATA != 0xC2) {
                         *SYNCPointer = 1;
                     }
                     PREV_DATA = 0xC2;
@@ -1009,16 +1008,16 @@ void ZxVg93::execAccurateTypeIII() {
                     fDRQ = DRQ;
                     break;
 
-                    case 0xF7:
-                    CRCL_Saved = (uint8_t)( CRC16_value & 0x00FF );
-                    *ADDRPointer++ = (uint8_t)( CRC16_value >> 8 );
-                    PREV_DATA = (uint8_t)( CRC16_value >> 8 );
+                case 0xF7:
+                    CRCL_Saved = (uint8_t) (CRC16_value & 0x00FF);
+                    *ADDRPointer++ = (uint8_t) (CRC16_value >> 8);
+                    PREV_DATA = (uint8_t) (CRC16_value >> 8);
                     CURR_STATE++;
                     break;
 
-                    default:
+                default:
                     *ADDRPointer = DATA_R;
-                    crc16( DATA_R );
+                    crc16(DATA_R);
                     PREV_DATA = DATA_R;
                     CURR_STATE += 2;
                     pCTRL->BSRR = EM_DRQ;// установка
@@ -1028,7 +1027,7 @@ void ZxVg93::execAccurateTypeIII() {
         }
         break;
 
-        case 15:
+    case 15:
         if (Next_Byte) {
             Next_Byte = false;
             PREV_DATA = CRCL_Saved;
@@ -1039,55 +1038,55 @@ void ZxVg93::execAccurateTypeIII() {
         }
         break;
 
-        case 16:
+    case 16:
         if (Next_Byte) {
             Next_Byte = false;
             if (Curr_Byte != INDEX_START) {
                 ADDRPointer = disk->buffer() + Curr_Byte;
                 SYNCPointer = disk->buffer() + MAX_TRACK_LEN + (Curr_Byte >> 3);
-                if (( pCTRL->IDR & EM_SIDE) == 0) {
+                if ((pCTRL->IDR & EM_SIDE) == 0) {
                     ADDRPointer += MAX_TRACK_LEN + MAX_BF_LEN;
                     SYNCPointer += MAX_TRACK_LEN + MAX_BF_LEN;
                 }
-                if ( pCTRL->IDR & EM_DRQ) {
+                if (pCTRL->IDR & EM_DRQ) {
                     fLOST = LOST;
                     *ADDRPointer = 0;
                     crc16(0);
                     PREV_DATA = 0;
                 } else {
-                    switch ( DATA_R) {
-                        case 0xF5:
+                    switch (DATA_R) {
+                    case 0xF5:
                         *ADDRPointer = 0xA1;
-                        if ( PREV_DATA != 0xA1 ) {
-                            *SYNCPointer = 1<<(Curr_Byte & 7);
+                        if (PREV_DATA != 0xA1) {
+                            *SYNCPointer = 1 << (Curr_Byte & 7);
                             CRCReset = true;
                         }
-                        crc16( 0xA1 );
+                        crc16(0xA1);
                         PREV_DATA = 0xA1;
                         pCTRL->BSRR = EM_DRQ;  // установка
                         fDRQ = DRQ;
                         break;
 
-                        case 0xF6:
+                    case 0xF6:
                         *ADDRPointer = 0xC2;
-                        if ( PREV_DATA != 0xC2 ) {
-                            *SYNCPointer = 1<<(Curr_Byte & 7);
+                        if (PREV_DATA != 0xC2) {
+                            *SYNCPointer = 1 << (Curr_Byte & 7);
                         }
                         PREV_DATA = 0xC2;
                         pCTRL->BSRR = EM_DRQ;  // установка
                         fDRQ = DRQ;
                         break;
 
-                        case 0xF7:
-                        CRCL_Saved = (uint8_t)( CRC16_value & 0x00FF );
-                        *ADDRPointer++ = (uint8_t)( CRC16_value >> 8 );
-                        PREV_DATA = (uint8_t)( CRC16_value >> 8 );
+                    case 0xF7:
+                        CRCL_Saved = (uint8_t) (CRC16_value & 0x00FF);
+                        *ADDRPointer++ = (uint8_t) (CRC16_value >> 8);
+                        PREV_DATA = (uint8_t) (CRC16_value >> 8);
                         CURR_STATE++;
                         break;
 
-                        default:
+                    default:
                         *ADDRPointer = DATA_R;
-                        crc16( DATA_R );
+                        crc16(DATA_R);
                         PREV_DATA = DATA_R;
                         pCTRL->BSRR = EM_DRQ;// установка
                         fDRQ = DRQ;
@@ -1099,7 +1098,7 @@ void ZxVg93::execAccurateTypeIII() {
         }
         break;
 
-        case 17:
+    case 17:
         if (Next_Byte) {
             Next_Byte = false;
             PREV_DATA = CRCL_Saved;
@@ -1110,7 +1109,7 @@ void ZxVg93::execAccurateTypeIII() {
         }
         break;
 
-        case 18:
+    case 18:
         // выход
         fBusy = 0;
         pCTRL->BSRR = EM_INTRQ;// установка
@@ -1118,7 +1117,7 @@ void ZxVg93::execAccurateTypeIII() {
         CMD_TYPE = 0;
         break;
 
-        default:
+    default:
         break;
     }
 }
@@ -1155,7 +1154,7 @@ void ZxVg93::execAccurateTypeIV() {
             }
         }
         disk->setOldIndex(fIndex);
-//          OldCprdy = ;    // на будущее
+        //          OldCprdy = ;    // на будущее
         break;
 
     case 3:
@@ -1175,16 +1174,16 @@ void ZxVg93::execAccurateTypeIV() {
 }
 
 void ZxVg93::dataTimerConfig() {
-// TIM7 clock enable
+    // TIM7 clock enable
     RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
     TIM7->ARR = 127;    // время отсчета 32 мкс ( 60 МГц / 128 / 15 )
     TIM7->PSC = 14;    // предделитель 15
     TIM7->CR1 |= TIM_CR1_ARPE;    // ARR Preload+
 // NVIC_IRQChannelPreemptionPriority = 15
     NVIC->IP[TIM7_IRQn] = 0x0F;
-// NVIC_IRQChannelCmd = ENABLE
+    // NVIC_IRQChannelCmd = ENABLE
     NVIC->ISER[TIM7_IRQn >> 5] = 1 << (TIM7_IRQn & 0x1F);
-//
+    //
     dataTimerStop();
 }
 
@@ -1199,7 +1198,7 @@ void ZxVg93::dataTimerStart() {
 }
 
 void ZxVg93::dataTimerContinue() {
-//      ADDRPointer = NULL;
+    //      ADDRPointer = NULL;
     IP_Counter = 0;
 }
 
@@ -1210,11 +1209,11 @@ void ZxVg93::dataTimerStop() {
     if (disk->unsavedCylinder()) {
         disk->saveCylinder();
     }
-//  if ( Unsaved_CylinderB )    Save_CylinderB();
+    //  if ( Unsaved_CylinderB )    Save_CylinderB();
 }
 
 void ZxVg93::delayConfig() {
-// TIM6 clock enable
+    // TIM6 clock enable
     RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
     TIM6->ARR = 65535;  // период импульсов
     TIM6->PSC = 599;  // предделитель 600 -> 100 кГц
@@ -1229,10 +1228,10 @@ void ZxVg93::delayStart(uint16_t TIM_ARR) {
 }
 
 void fault_err(FRESULT rc) {
-    const char *str = "OK\0" "DISK_ERR\0" "INT_ERR\0" "NOT_READY\0" "NO_FILE\0" "NO_PATH\0"
-            "INVALID_NAME\0" "DENIED\0" "EXIST\0" "INVALID_OBJECT\0" "WRITE_PROTECTED\0"
-            "INVALID_DRIVE\0" "NOT_ENABLED\0" "NO_FILE_SYSTEM\0" "MKFS_ABORTED\0" "TIMEOUT\0"
-            "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
+    const char* str = "OK\0" "DISK_ERR\0" "INT_ERR\0" "NOT_READY\0" "NO_FILE\0" "NO_PATH\0"
+        "INVALID_NAME\0" "DENIED\0" "EXIST\0" "INVALID_OBJECT\0" "WRITE_PROTECTED\0"
+        "INVALID_DRIVE\0" "NOT_ENABLED\0" "NO_FILE_SYSTEM\0" "MKFS_ABORTED\0" "TIMEOUT\0"
+        "LOCKED\0" "NOT_ENOUGH_CORE\0" "TOO_MANY_OPEN_FILES\0";
     int i;
 
     for (i = 0; i != rc && *str; ++i) {
@@ -1246,7 +1245,7 @@ void fault_err(FRESULT rc) {
      #else*/
     while (1)
         ;
-//#endif
+    //#endif
 }
 
 /*

@@ -11,22 +11,22 @@
 
 #include "../../_zx/Inc/zx_disk_feeder.h"
 
-/*extern char sFileFullNameA[];
-extern bool bFileLoadedA;
-*/
+ /*extern char sFileFullNameA[];
+ extern bool bFileLoadedA;
+ */
 #define BITRATE1 0x00FA
 #define BITRATE2 0x01F4
 
 
-MFDIMG *mfdimg;
-MFDTRACKIMG *mfdtrackimg;
+MFDIMG* mfdimg;
+MFDTRACKIMG* mfdtrackimg;
 uint16_t mfd_NOTA;              // общее кол-во треков в файле ( с учетом сторон )
 
 //FIXME: provide common error handling for project
 extern void fault_err(FRESULT rc);
-extern void xprintf(const char *msg);
+extern void xprintf(const char* msg);
 
-bool ZxMfdFeeder::parseImageFile(const char *fileName) {
+bool ZxMfdFeeder::parseImageFile(const char* fileName) {
     UINT br;
     Unsaved_CylinderA = false;
 
@@ -54,7 +54,7 @@ bool ZxMfdFeeder::parseImageFile(const char *fileName) {
     /*ret = f_close(&file);
      if (ret)
      fault_err (ret);*/
-    //
+     //
     mfdimg = (MFDIMG*) buffA;
     //
     if (strcmp("MFMDECD", (char const*) mfdimg->headername)) {
@@ -91,13 +91,13 @@ bool ZxMfdFeeder::parseImageFile(const char *fileName) {
 void ZxMfdFeeder::loadCylinder(uint32_t Cyl_Number) {
     FRESULT ret;
     UINT br;
-//  if ( Cyl_Number > Max_Cylinder )    return;
-//pCTRL->BSRRL = EM_TST;
-    //
-    /*ret = f_open(&file, sFileFullNameA, FA_READ);
-     if (ret)
-     fault_err(ret);*/
-    //
+    //  if ( Cyl_Number > Max_Cylinder )    return;
+    //pCTRL->BSRRL = EM_TST;
+        //
+        /*ret = f_open(&file, sFileFullNameA, FA_READ);
+         if (ret)
+         fault_err(ret);*/
+         //
     ret = f_lseek(&file, track_offsetsA[Cyl_Number * 2]);
     if (ret) {
         fault_err(ret);
@@ -111,7 +111,7 @@ void ZxMfdFeeder::loadCylinder(uint32_t Cyl_Number) {
     /*ret = f_close(&file);
      if (ret)
      fault_err(ret);*/
-    //
+     //
     Loaded_CylinderA = Cyl_Number;
     //
 //pCTRL->BSRRH = EM_TST;
@@ -120,13 +120,13 @@ void ZxMfdFeeder::loadCylinder(uint32_t Cyl_Number) {
 void ZxMfdFeeder::saveCylinder() {
     FRESULT ret;
     UINT bw;
-//  if ( Cyl_Number > Max_Cylinder )
-//pCTRL->BSRRL = EM_TST;
-    //
-    /*ret = f_open(&file, sFileFullNameA, FA_WRITE);
-     if (ret)
-     fault_err(ret);*/
-    //
+    //  if ( Cyl_Number > Max_Cylinder )
+    //pCTRL->BSRRL = EM_TST;
+        //
+        /*ret = f_open(&file, sFileFullNameA, FA_WRITE);
+         if (ret)
+         fault_err(ret);*/
+         //
     ret = f_lseek(&file, track_offsetsA[Loaded_CylinderA * 2]);
     if (ret) {
         fault_err(ret);
@@ -146,7 +146,7 @@ void ZxMfdFeeder::saveCylinder() {
     /*ret = f_close(&file);
      if (ret)
      fault_err(ret);*/
-    //
+     //
     Unsaved_CylinderA = false;
     //
 //pCTRL->BSRRH = EM_TST;
