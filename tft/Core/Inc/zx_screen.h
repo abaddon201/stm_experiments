@@ -14,6 +14,11 @@ class ZxScreen {
     uint16_t brightColors[8];
     uint16_t darkColors[8];
 
+    uint8_t screen1[6912];
+    uint8_t screen2[6912];
+
+    uint8_t *currentWriteScreen;
+    uint8_t *currentShowingScreen;
 public:
     ZxScreen();
 };

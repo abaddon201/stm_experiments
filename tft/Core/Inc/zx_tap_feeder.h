@@ -2,7 +2,7 @@
  * zx_tap_feeder.h
  *
  *  Created on: 21 сент. 2020 г.
- *      Author: user
+ *      Author: Abby
  */
 
 #ifndef INC_ZX_TAP_FEEDER_H_
@@ -12,9 +12,8 @@
 
 #include "zx_tap_sample.h"
 
-#define FILE_BLOCK_SIZE 1024
-
 class ZxTapFeeder {
+    static constexpr int FILE_BLOCK_SIZE = 1024;
     int freq = 44100;
     int samplesCountPilot = 27;
     int samplesCountSync1 = 8;

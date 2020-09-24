@@ -2,7 +2,7 @@
  * task_display.cpp
  *
  *  Created on: 23 сент. 2020 г.
- *      Author: user
+ *      Author: Abby
  */
 
 #include "task_display.h"
@@ -12,22 +12,12 @@
 #include "performance.h"
 #include "touch.h"
 
-#include "fatfs.h"
-
 #include <string.h>
 
 Tft9341 *display;
 TouchScreen *touchScreen;
 
 void displayTask(void *params) {
-    char SD_Path[4]; /* SD logical drive path */
-
-    FRESULT res; /* FatFs function common result code */
-    memset(&SDFatFS, 0, sizeof(FATFS));
-    res = f_mount(&SDFatFS, (TCHAR const*) SD_Path, 1);
-    if (res != FR_OK) {
-        Error_Handler();
-    }
     display = new Tft9341();
     touchScreen = new TouchScreen();
 
@@ -42,4 +32,3 @@ void displayTask(void *params) {
         pressed = touchScreen->getTouch(&x, &y);
     }
 }
-

@@ -2,7 +2,7 @@
  * ili9341.c
  *
  *  Created on: Sep 1, 2020
- *      Author: user
+ *      Author: Abby
  */
 
 #include "ili9341.h"
@@ -14,14 +14,11 @@
 #define  TFT9341_RESET_IDLE   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_SET);
 
 void Tft9341::init() {
-//    uint32_t dtt = 0;
     fonts = new FontSystem(this);
     fonts->init();
 
     reset();
     HAL_Delay(1000);
-    //read display Id
-//    dtt = TFT9341_ReadReg(0xD3);
 }
 
 uint32_t Tft9341::readReg(uint8_t r) {
@@ -229,11 +226,6 @@ void Tft9341::flood(uint16_t color, uint32_t len) {
     uint8_t i, hi = color >> 8, lo = color;
 
     sendCommand(0x2C);
-    /*TFT9341_SendData(hi);
-     DelayMicro(1);
-
-     TFT9341_SendData(lo);
-     len--;*/
     blocks = (uint16_t) (len / 64); //64 pixels/block
 
     while (blocks--) {

@@ -2,7 +2,7 @@
  * fonts.c
  *
  *  Created on: 2 сент. 2020 г.
- *      Author: user
+ *      Author: Abby
  */
 
 #include "fonts.h"
@@ -68,10 +68,6 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
     fontsize = font->bytesWidth * font->Height;
     offsetfile = (s - ' ') * fontsize;
 
-    //FIXME: maybe this must be in file read part
-    //HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-    //FIXME: end
-
     for (i = 0; i < height; i++) {
         if (font->bytesWidth == 1) {
             line = font->data[offsetfile + i];
@@ -81,7 +77,6 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
             line = (font->data[offsetfile + i * 3] << 16) | (font->data[offsetfile + i * 3 + 1] << 8)
                     | (font->data[offsetfile + i * 3 + 2]);
         }
-//                line=0xFFFF;
 
         uint16_t mask = 1 << (width + offset1 - 1);
         for (j = 0; j < width; j++) {
@@ -95,17 +90,6 @@ void FontSystem::drawChar(struct Font *font, uint16_t x, uint16_t y, uint8_t s) 
         y++;
     }
 }
-
-/*void TFT9341_SetTextColor(uint16_t color) {
- lcdprop.TextColor = color;
- }
-
- //————————————————————–
-
- void TFT9341_SetBackColor(uint16_t color) {
- lcdprop.BackColor = color;
- }
- */
 
 void FontSystem::drawString(FontSize fontSize, uint16_t x, uint16_t y, const char *str) {
     Font *font;
@@ -133,4 +117,3 @@ void FontSystem::drawString(FontSize fontSize, uint16_t x, uint16_t y, const cha
         ++str;
     }
 }
-

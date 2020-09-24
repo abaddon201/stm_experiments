@@ -15,6 +15,4 @@ public:
     void startIntClock();
 };
 
-
-
 #endif /* INC_ZX_CORE_H_ */

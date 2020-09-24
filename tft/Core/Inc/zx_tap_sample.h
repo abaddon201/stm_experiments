@@ -2,7 +2,7 @@
  * zx_tap_sample.h
  *
  *  Created on: 21 сент. 2020 г.
- *      Author: user
+ *      Author: Abby
  */
 
 #ifndef INC_ZX_TAP_SAMPLE_H_

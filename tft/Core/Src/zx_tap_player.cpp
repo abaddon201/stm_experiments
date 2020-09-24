@@ -2,7 +2,7 @@
  * zx_tap_player.cpp
  *
  *  Created on: Sep 6, 2020
- *      Author: user
+ *      Author: Abby
  */
 
 #include "zx_tap_player.h"
@@ -13,7 +13,7 @@
 #include "dac.h"
 
 namespace {
-ZxTapPlayer* _player;
+ZxTapPlayer *_player;
 }
 
 extern "C" {
@@ -40,26 +40,6 @@ void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac) {
 }
 
 }
-/*
- void ZxTapPlayer::outTone(unsigned char level, int samplesCount) {
- for (int n = 0; n < samplesCount; n++) {
- // FIXME: write to the DMA buffer
- //fwrite((unsigned char*) &level, 1, 1, hwav);
- }
- }
-
- void ZxTapPlayer::outByte(uint8_t byte) {
- for (int i = 0; i < 8; i++, byte <<= 1) {
- if (byte & 128) {
- outTone(HI, samplesCountOne);
- outTone(LOW, samplesCountOne);
- } else {
- outTone(HI, samplesCountZero);
- outTone(LOW, samplesCountZero);
- }
- }
- }
- */
 
 void ZxTapPlayer::fillBuffer(int part) {
     if (fileEnded) {
@@ -95,22 +75,7 @@ void ZxTapPlayer::fillBuffer(int part) {
         buffer[position] = 0;
     }
 }
-/*
- bool ZxTapPlayer::writeCurrentSample() {
- if (currentSample.samples) {
- while (currentSample.samples != 0) {
- dmaBuffer[position] = currentSample.level;
- --currentSample.samples;
- position++;
- if (position >= TAP_DMA_BUFFER_SIZE / 2) {
- return false;
- }
- }
- }
- //prepare next sample
- return true;
- }
- */
+
 void ZxTapPlayer::play(ZxTapFeeder *feeder) {
     _player = this;
     this->feeder = feeder;
@@ -136,54 +101,12 @@ void ZxTapPlayer::play(ZxTapFeeder *feeder) {
      TIM4->CR1 |= TIM_CR1_CEN;
      */
     HAL_TIM_Base_Start(&htim4);
-    /*
-     unsigned char byte;
-     while (1) {
-     unsigned short length;
-     if (readedBytes - currentByte<2) {
-     if (f_read(&file, fileBuff, FILE_BLOCK_SIZE, &readedBytes)!=FR_OK) {
-     //FIXME: error handling
-     break;
-     }
-     }
-     //get block length
-     length = (fileBuff[currentByte]<<8) | fileBuff[currentByte+1];
-     currentByte+=2;
-     //create pilot tone
-     int pilotImpulses;
-
-     if (fileBuff[currentByte]) {
-     pilotImpulses = IMPULSNUMBER_PILOT_DATA;
-     } else {
-     pilotImpulses = IMPULSNUMBER_PILOT_HEADER;
-     }
-     for (int m = 0; m < pilotImpulses; m++) {
-     outTone(HI, samplesCountPilot);
-     outTone(LOW, samplesCountPilot);
-     }
-     //формируем синхросигнал
-     outTone(HI, samplesCountSync1);
-     outTone(LOW, samplesCountSync2);
-     //читаем данные и выдаём их
-     outByte(fileBuff[2]);
-     for (int l = 1; l < length; l++) {
-     unsigned char byte;
-     //if (fread(&byte, 1, sizeof(char), file_tap) < sizeof(char))
-     break;/
-     outByte(byte);
-     }
-     outTone(HI, samplesCountSync3);
-     //пауза
-     outTone(LOW, samplesCountPause);
-     }*/
 }
 
 void ZxTapPlayer::stop() {
     HAL_DAC_Stop_DMA(&hdac, DAC_CHANNEL_1);
     HAL_TIM_Base_Stop(&htim4);
-
 }
 
 ZxTapPlayer::ZxTapPlayer() {
 }
-
