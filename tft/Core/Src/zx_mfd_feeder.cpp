@@ -10,9 +10,9 @@
 
 #include <string.h>
 
-extern char sFileFullNameA[];
+/*extern char sFileFullNameA[];
 extern bool bFileLoadedA;
-
+*/
 #define BITRATE1 0x00FA
 #define BITRATE2 0x01F4
 

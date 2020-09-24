@@ -52,8 +52,8 @@ volatile uint8_t fREC_NF;   // 4
 volatile uint8_t fWFAULT;   // 5
 volatile uint8_t fREC_TYP;  // 5
 
-uint8_t Max_CylinderB;
-bool Unsaved_CylinderB;
+/*uint8_t Max_CylinderB;
+ bool Unsaved_CylinderB;*/
 volatile bool PortReset;
 long int i, j;
 uint8_t CRCL_Saved;
@@ -94,14 +94,15 @@ void ZxVg93::mainLoop() {
         //
         if (bNewCMD) {
             bNewCMD = false;
-            if ((CMD_R & CMD7) == 0)
-            CMD_TYPE = 1;
-            else if ((CMD_R & CMD6) == 0)
-            CMD_TYPE = 2;
-            else if ((CMD_R & (CMD5 | CMD4)) != CMD4)
-            CMD_TYPE = 3;
-            else
-            CMD_TYPE = 4;
+            if ((CMD_R & CMD7) == 0) {
+                CMD_TYPE = 1;
+            } else if ((CMD_R & CMD6) == 0) {
+                CMD_TYPE = 2;
+            } else if ((CMD_R & (CMD5 | CMD4)) != CMD4) {
+                CMD_TYPE = 3;
+            } else {
+                CMD_TYPE = 4;
+            }
             CURR_STATE = 1;
         }
         //
@@ -387,8 +388,7 @@ void ZxVg93::execAccurateTypeI() {
             }
             DWPointer = (uint32_t*) (disk->buffer() + temp2);
             if (*DWPointer == IAM && (*SYNCPointer & 1 << (Curr_Byte & 7)) != 0) {
-                if (*((uint8_t*) DWPointer + 4) == TRACK_R)
-                {
+                if (*((uint8_t*) DWPointer + 4) == TRACK_R) {
                     CRCReset = true;
                     crc16( 0xA1 );
                     ADDRPointer = (uint8_t*)DWPointer + 1;
@@ -514,13 +514,10 @@ void ZxVg93::execAccurateTypeII() {
             }
             DWPointer = (uint32_t*) (disk->buffer() + temp2);
             if (*DWPointer == IAM && (*SYNCPointer & 1 << (Curr_Byte & 7)) != 0) {
-                if (*((uint8_t*) DWPointer + 4) == TRACK_R&&
-                ( (*((uint8_t*)DWPointer + 5) == ( ( CMD_R & CMDII_s ) != 0 ) ) ||
+                if (*((uint8_t*) DWPointer + 4) == TRACK_R&& ((*((uint8_t*)DWPointer + 5) == ( ( CMD_R & CMDII_s ) != 0 ) ) ||
                         ( ( CMD_R & CMDII_C ) == 0 ) ) &&
-                *((uint8_t*)DWPointer + 6) == SECT_R )
-                {
-                    switch ( *((uint8_t*)DWPointer + 7) & 3 )
-                    {
+                *((uint8_t*)DWPointer + 6) == SECT_R ) {
+                    switch ( *((uint8_t*)DWPointer + 7) & 3 ) {
                         case 0: Sec_Length = 128; break;
                         case 1: Sec_Length = 256; break;
                         case 2: Sec_Length = 512; break;
@@ -741,12 +738,12 @@ void ZxVg93::execAccurateTypeII() {
         case 21:
         if ( Next_Byte ) {
             Next_Byte = false;
-            if ( CRC16_Byte_Counter == Sec_Length + 4 ) {
+            if (CRC16_Byte_Counter == Sec_Length + 4 ) {
                 *ADDRPointer++ = (uint8_t)( CRC16_value >> 8 );
                 CRCL_Saved = (uint8_t)( CRC16_value & 0x00FF );
                 crc16( (uint8_t)( CRC16_value >> 8 ) );
                 CURR_STATE++;
-            } else if ( pCTRL->IDR & EM_DRQ ) {
+            } else if (pCTRL->IDR & EM_DRQ) {
                 fLOST = LOST;
                 *ADDRPointer++ = 0;
                 crc16( 0 );
@@ -1173,7 +1170,8 @@ void ZxVg93::execAccurateTypeIV() {
         CMD_TYPE = 0;
         break;
 
-    default: break;
+    default:
+        break;
     }
 }
 
