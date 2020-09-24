@@ -31,9 +31,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "base.h"
-
 #include <cmsis_os2.h>
+
+#include "../../_utils/Inc/base.h"
 
 /* USER CODE END Includes */
 

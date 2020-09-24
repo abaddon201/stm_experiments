@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "zx_disk_feeder.h"
+#include "../../_zx/Inc/zx_disk_feeder.h"
 
 // Заголовок файла образа
 typedef struct {

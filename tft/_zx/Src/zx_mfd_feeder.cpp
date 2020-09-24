@@ -5,10 +5,11 @@
  *      Author: Abby
  */
 
-#include "zx_disk_feeder.h"
-#include "zx_mfd_feeder.h"
+#include "../../_zx/Inc/zx_mfd_feeder.h"
 
 #include <string.h>
+
+#include "../../_zx/Inc/zx_disk_feeder.h"
 
 /*extern char sFileFullNameA[];
 extern bool bFileLoadedA;

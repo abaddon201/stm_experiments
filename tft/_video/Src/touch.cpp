@@ -5,14 +5,14 @@
  *      Author: Abby
  */
 
-#include "touch.h"
-
-#include "ili9341.h"
-#include "config_file.h"
-#include "delay.h"
+#include "../../_video/Inc/touch.h"
 
 #include <stdlib.h>
 #include <math.h>
+
+#include "../../_utils/Inc/config_file.h"
+#include "../../_utils/Inc/delay.h"
+#include "../../_video/Inc/ili9341.h"
 
 void TouchScreen::drawTouchPoint(uint16_t x, uint16_t y, uint16_t color) {
     display->drawLine(x - 12, y, x + 13, y, color);

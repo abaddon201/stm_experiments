@@ -5,9 +5,9 @@
  *      Author: Abby
  */
 
-#include "zx_screen.h"
+#include "../../_zx/Inc/zx_screen.h"
 
-#include "ili9341.h"
+#include "../../_video/Inc/ili9341.h"
 
 ZxScreen::ZxScreen() {
     brightColors[0] = Tft9341::convert24to16(0x000000);

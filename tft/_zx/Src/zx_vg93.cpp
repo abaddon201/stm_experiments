@@ -5,16 +5,15 @@
  *      Author: Abby
  */
 
-#include "zx_vg93.h"
+#include "../../_zx/Inc/zx_vg93.h"
 
 #include <string.h>
 #include <stdbool.h>
 
 #include "ff.h"
 
-#include "crc16.h"
-
-#include "zx_disk_feeder.h"
+#include "../../_utils/Inc/crc16.h"
+#include "../../_zx/Inc/zx_disk_feeder.h"
 
 //const uint16_t R0R1_ARR[] = { 600, 1200, 2000, 3000 };
 const uint16_t R0R1_ARR[] = { 1, 600, 1400, 2400 }; // коррекция на выполнение Load_Cylinder (6-7 мс)

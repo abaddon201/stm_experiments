@@ -5,9 +5,8 @@
  *      Author: Abby
  */
 
-#include "zx_core.h"
+#include "../../_zx/Inc/zx_core.h"
 
-//FIXME: when port to 469
 #include <stm32f407xx.h>
 
 void ZxCore::startCPUClock() {

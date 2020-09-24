@@ -5,13 +5,14 @@
  *      Author: Abby
  */
 
-#include "fonts.h"
+#include "../../_video/Inc/fonts.h"
 
 #include <string.h>
 #include <stdint.h>
 #include "stm32f4xx_hal.h"
 #include "ff.h"
-#include "ili9341.h"
+
+#include "../../_video/Inc/ili9341.h"
 
 void FontSystem::loadFont(struct Font *font, uint16_t w, uint16_t h, const char *fname) {
     FIL *MyFile = new FIL();

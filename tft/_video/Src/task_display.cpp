@@ -5,14 +5,14 @@
  *      Author: Abby
  */
 
-#include "task_display.h"
-
-#include "fonts.h"
-#include "ili9341.h"
-#include "performance.h"
-#include "touch.h"
+#include "../../_video/Inc/task_display.h"
 
 #include <string.h>
+
+#include "../../_utils/Inc/performance.h"
+#include "../../_video/Inc/fonts.h"
+#include "../../_video/Inc/ili9341.h"
+#include "../../_video/Inc/touch.h"
 
 Tft9341 *display;
 TouchScreen *touchScreen;

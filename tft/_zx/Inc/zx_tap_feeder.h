@@ -10,7 +10,7 @@
 
 #include "ff.h"
 
-#include "zx_tap_sample.h"
+#include "../../_zx/Inc/zx_tap_sample.h"
 
 class ZxTapFeeder {
     static constexpr int FILE_BLOCK_SIZE = 1024;
