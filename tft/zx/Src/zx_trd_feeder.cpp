@@ -9,6 +9,8 @@
 
 #include <string.h>
 
+#include "base.h"
+
 #include "crc16.h"
 #include "zx_disk_feeder.h"
 
@@ -16,7 +18,6 @@
 #define BITRATE2 0x01F4
 
 //FIXME: provide common error handling for project
-extern void fault_err(FRESULT rc);
 extern void xprintf(const char *msg);
 
 #define GAP0_SIZE   10
@@ -64,7 +65,7 @@ bool ZxTrdFeeder::parseImageFile(const char *fileName) {
     // FIXME: read/write access
     ret = f_open(&file, fileName, FA_READ);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     uint8_t *bufptr = buffA;
     memset(bufptr, GAP0_VALUE, GAP0_SIZE);
@@ -118,7 +119,7 @@ void ZxTrdFeeder::loadCylinder(uint32_t Cyl_Number) {
     //
     ret = f_lseek(&file, Cyl_Number * 16 * 256 * 2);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     for (int i = 0; i < 16; ++i) {
@@ -127,7 +128,7 @@ void ZxTrdFeeder::loadCylinder(uint32_t Cyl_Number) {
         uint8_t *crc_bufptr = bufptr - SYNC_SIZE;
         ret = f_read(&file, bufptr, 256, &br);
         if (ret) {
-            fault_err(ret);
+            baseErrorHandler(fileSystemFault(ret));
         }
         bufptr += 256;
         uint16_t crc = crc16(crc_bufptr, 260);
@@ -145,12 +146,12 @@ void ZxTrdFeeder::saveCylinder() {
         uint8_t *bufptr = &(buffA[DATA_OFFSET + i * FULL_SIZE]);
         ret = f_lseek(&file, Loaded_CylinderA * 16 * 256 * 2);
         if (ret) {
-            fault_err(ret);
+            baseErrorHandler(fileSystemFault(ret));
         }
         //
         ret = f_write(&file, bufptr, (16 * 256) << 1, &bw);
         if (ret) {
-            fault_err(ret);
+            baseErrorHandler(fileSystemFault(ret));
         }
     }
     //

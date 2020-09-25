@@ -9,6 +9,7 @@
 
 #include <string.h>
 
+#include "base.h"
 #include "zx_disk_feeder.h"
 
  /*extern char sFileFullNameA[];
@@ -23,7 +24,6 @@ MFDTRACKIMG* mfdtrackimg;
 uint16_t mfd_NOTA;              // общее кол-во треков в файле ( с учетом сторон )
 
 //FIXME: provide common error handling for project
-extern void fault_err(FRESULT rc);
 extern void xprintf(const char* msg);
 
 bool ZxMfdFeeder::parseImageFile(const char* fileName) {
@@ -43,12 +43,12 @@ bool ZxMfdFeeder::parseImageFile(const char* fileName) {
     // FIXME: read/write access
     ret = f_open(&file, fileName, FA_READ);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     ret = f_read(&file, buffA, 0x1020, &br);  // 0x1020 - заголовки + таблица смещений треков
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     /*ret = f_close(&file);
@@ -100,12 +100,12 @@ void ZxMfdFeeder::loadCylinder(uint32_t Cyl_Number) {
          //
     ret = f_lseek(&file, track_offsetsA[Cyl_Number * 2]);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     ret = f_read(&file, &buffA, (MAX_TRACK_LEN + MAX_BF_LEN) << 1, &br);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     /*ret = f_close(&file);
@@ -129,18 +129,18 @@ void ZxMfdFeeder::saveCylinder() {
          //
     ret = f_lseek(&file, track_offsetsA[Loaded_CylinderA * 2]);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     ret = f_write(&file, &buffA, (MAX_TRACK_LEN + MAX_BF_LEN) << 1, &bw);
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
 //xprintf("written=%d, ret=%d\r\n", bw, ret );
     //
     if (ret) {
-        fault_err(ret);
+        baseErrorHandler(fileSystemFault(ret));
     }
     //
     /*ret = f_close(&file);
