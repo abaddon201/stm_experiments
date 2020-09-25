@@ -15,6 +15,8 @@ class Eeprom {
     void writeByte(uint8_t data);
     void pulseWE();
     void pulseOE();
+    void OELow();
+    void OEHigh();
     bool writePage(uint8_t* buffer, int offset);
 public:
     bool write(uint8_t* buffer, int offset, int size);

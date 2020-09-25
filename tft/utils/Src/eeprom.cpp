@@ -44,6 +44,14 @@ void Eeprom::pulseOE() {
     delay_ms(1);
 }
 
+void Eeprom::OELow() {
+    ROM_CTRL->BSRR = ROM_OE << 16;   // reset
+}
+
+void Eeprom::OEHigh() {
+    ROM_CTRL->BSRR = ROM_OE;   // set
+}
+
 bool Eeprom::writePage(uint8_t *buffer, int offset) {
     setAddress(0x5555);
     writeByte(0xAA);
@@ -70,8 +78,9 @@ bool Eeprom::writePage(uint8_t *buffer, int offset) {
     //check that async write is finished
     uint8_t reg;
     do {
-        pulseOE();
+        OELow();
         reg = REG_D->IDR;
+        OEHigh();
     } while (reg != lastByte);
     return true;
 }
