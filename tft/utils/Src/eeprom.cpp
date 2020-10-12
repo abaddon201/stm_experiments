@@ -9,6 +9,7 @@
 #include "delay.h"
 #include "base.h"
 #include "fatfs.h"
+#include "fs_utils.h"
 
 #include "zx_core.h"
 

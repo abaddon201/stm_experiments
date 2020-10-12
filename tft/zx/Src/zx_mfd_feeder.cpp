@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "base.h"
+#include "fs_utils.h"
 #include "zx_disk_feeder.h"
 
  /*extern char sFileFullNameA[];

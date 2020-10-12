@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "base.h"
-
+#include "fs_utils.h"
 #include "crc16.h"
 #include "zx_disk_feeder.h"
 
